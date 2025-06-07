@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Okul Bilgi Portalı - Veli Girişi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold text-blue-800">Okul Bilgi Portalı</h1>
+                    <p class="text-gray-600">Veli Bilgilendirme Portalı</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative" id="notificationContainer">
+                        <button id="notificationButton" class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg flex items-center">
+                            <i class="fas fa-bell mr-2"></i>
+                            <span>Bildirimler</span>
+                            <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
+                        </button>
+                        <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-10">
+                            <div class="p-3 border-b border-gray-200">
+                                <h3 class="font-semibold text-gray-800">Bildirimler</h3>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto">
+                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
+                                            <i class="fas fa-flag text-blue-600"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Voleybol Turnuvası</p>
+                                            <p class="text-xs text-gray-500">Okulumuz voleybol takımı TÜrkiye finallerine katılmaya hak kazandı.</p>
+                                            <p class="text-xs text-gray-400 mt-1">2 saat önce</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0 bg-green-100 rounded-full p-2">
+                                            <i class="fas fa-bus text-green-600"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Bilim Müzesi Gezisi</p>
+                                            <p class="text-xs text-gray-500">5. ve 6. sınıflar için 18 Nisan tarihinde bilim müzesi gezisi düzenlenecektir.</p>
+                                            <p class="text-xs text-gray-400 mt-1">1 gün önce</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0 bg-purple-100 rounded-full p-2">
+                                            <i class="fas fa-book text-purple-600"></i>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Kitap Fuarı</p>
+                                            <p class="text-xs text-gray-500">Kütüphaneler haftası dolayısıyla okul kütüphanesinde kitap fuarı düzenlenecektir.</p>
+                                            <p class="text-xs text-gray-400 mt-1">2 gün önce</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-2 text-center border-t border-gray-200">
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Tüm bildirimleri gör</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Banner -->
+        <div class="mb-8 overflow-hidden">
+            <div class="notification-banner text-white py-3 px-4 rounded-lg whitespace-nowrap">
+                <span class="font-bold mr-4"><i class="fas fa-exclamation-circle mr-2"></i>ÖNEMLİ DUYURU:</span>
+                <span class="text-sm md:text-base">23 Nisan Ulusal Egemenlik ve Çocuk Bayramı töreni 23 Nisan Pazartesi günü saat 10:00'da okul bahçesinde yapılacaktır.</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Grade Filter -->
+            <div class="lg:col-span-1 bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-filter mr-2 text-blue-600"></i>
+                    Sınıf Filtreleri
+                </h2>
+                <div class="mb-6">
+                    <label class="block text-gray-700 mb-2">Sınıf Seviyesi</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button class="grade-level-btn py-2 rounded-lg bg-blue-600 text-white font-medium">5</button>
+                        <button class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium">6</button>
+                        <button class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium">7</button>
+                        <button class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium">8</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class List -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-graduation-cap mr-2 text-blue-600"></i>
+                    Sınıflar
+                </h2>
+                <div id="class-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Class cards will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Information -->
+        <div class="mt-8">
+            <div id="classInfoContainer" class="bg-white rounded-xl shadow-md p-6">
+                <div class="text-center py-12 text-gray-400">
+                    <i class="fas fa-school text-5xl mb-4"></i>
+                    <p class="text-xl">Lütfen bir sınıf seçiniz</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- School Activities -->
+        <div class="mt-8 bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-calendar-alt mr-2 text-purple-600"></i>
+                Okul Etkinlikleri
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Trips -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-bus mr-2 text-green-600"></i>
+                        Okul Gezileri
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="border border-green-100 rounded-lg p-4 hover:bg-green-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-green-100 text-green-800 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <h4 class="font-semibold">Bilim Müzesi Gezisi</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Tarih: 18 Nisan 2025</p>
+                            <p class="text-sm text-gray-600 mb-2">Sınıflar: 5. ve 6. Sınıflar</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Öğrencilerin bilim ve teknoloji alanında gelişimine katkı sağlamak amacıyla düzenlenen gezi.</p>
+                            <a href="#" class="text-green-600 text-sm font-medium flex items-center">
+                                İzin Formunu İndir <i class="fas fa-download ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                        <div class="border border-green-100 rounded-lg p-4 hover:bg-green-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-green-100 text-green-800 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-theater-masks"></i>
+                                </div>
+                                <h4 class="font-semibold">Konya Gezisi</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Tarih: 3 Mayıs 2025</p>
+                            <p class="text-sm text-gray-600 mb-2">Sınıflar: 5. ve 6. Sınıflar</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Kültür gezisi</p>
+                            <a href="#" class="text-green-600 text-sm font-medium flex items-center">
+                                İzin Formunu İndir <i class="fas fa-download ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Competitions -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-trophy mr-2 text-yellow-600"></i>
+                        Müsabakalar ve Yarışmalar
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="border border-yellow-100 rounded-lg p-4 hover:bg-yellow-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-yellow-100 text-yellow-800 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-volleyball-ball"></i>
+                                </div>
+                                <h4 class="font-semibold">Voleybol Turnuvası</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Tarih: 18 Nisan 2025</p>
+                            <p class="text-sm text-gray-600 mb-2">Konum: Çanakkale Spor Salonu</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Türkiye finallerine kalan okulumuz voleybol takımının müsabakaları.</p>
+                            <a href="#" class="text-yellow-600 text-sm font-medium flex items-center">
+                                Detayları Gör <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                        <div class="border border-yellow-100 rounded-lg p-4 hover:bg-yellow-50 transition-colors">
+                            <div class="flex items-center mb-2">
+                                <div class="bg-yellow-100 text-yellow-800 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <h4 class="font-semibold">SHORE Projesi Yıl Sonu Kısa Film Festivali</h4>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-2">Tarih: 10-17 Haziran 2025</p>
+                            <p class="text-sm text-gray-600 mb-2">Konum: Hürriyet Ortaokulu Konferans Salonu</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Öğrencilerimizin SHORE kapsamında hazırladıkları kısa filmin gösterimi ve yıl sonu şenlikleri</p>
+                            <a href="#" class="text-yellow-600 text-sm font-medium flex items-center">
+                                Detayları Gör <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Announcements -->
+        <div class="mt-8 bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-calendar-star mr-2 text-purple-600"></i>
+                Özel Gün ve Haftalar
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="border border-purple-100 rounded-lg p-4 hover:bg-purple-50 transition-colors">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-purple-100 text-purple-800 p-2 rounded-lg mr-3">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h3 class="font-semibold">Orman Haftası</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">21-26 Mart</p>
+                    <a href="#" class="text-purple-600 text-sm font-medium flex items-center">
+                        Sunumu Görüntüle <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                    </a>
+                </div>
+                <div class="border border-green-100 rounded-lg p-4 hover:bg-green-50 transition-colors">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-green-100 text-green-800 p-2 rounded-lg mr-3">
+                            <i class="fas fa-child"></i>
+                        </div>
+                        <h3 class="font-semibold">23 Nisan</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">23 Nisan</p>
+                    <a href="#" class="text-green-600 text-sm font-medium flex items-center">
+                        Etkinlik Programı <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                    </a>
+                </div>
+                <div class="border border-yellow-100 rounded-lg p-4 hover:bg-yellow-50 transition-colors">
+                    <div class="flex items-center mb-3">
+                        <div class="bg-yellow-100 text-yellow-800 p-2 rounded-lg mr-3">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3 class="font-semibold">Kütüphaneler Haftası</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">28 Mart-3 Nisan</p>
+                    <a href="#" class="text-yellow-600 text-sm font-medium flex items-center">
+                        Kitap Listesi <i class="fas fa-external-link-alt ml-1 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Info Template (Hidden) -->
+    <template id="classInfoTemplate">
+        <div class="slide-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                    <i class="fas fa-chalkboard-teacher mr-3 text-blue-600"></i>
+                    <span id="className">5A</span> Sınıf Bilgileri
+                </h2>
+                <div class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    <i class="fas fa-clock mr-1"></i>
+                    <span id="lastUpdated">Son güncelleme: 10:15</span>
+                </div>
+            </div>
+
+            <!-- Current Lesson -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-map-marker-alt mr-2 text-blue-500"></i>
+                    Şu Anda
+                </h3>
+                <div id="currentLesson" class="active-lesson bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-blue-800 text-lg" id="currentLessonName">Matematik</div>
+                            <div class="text-gray-600" id="currentLessonTime">10:00 - 10:40</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-medium" id="currentTeacher">Öğretmen: Eşref AKKAŞ</div>
+                            <div class="text-sm text-gray-600" id="currentClassroom">Derslik: 8D</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-calendar-day mr-2 text-blue-500"></i>
+                    Günlük Ders Programı
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-blue-600 text-white">
+                            <tr>
+                                <th class="py-2 px-4 text-left">Ders Saati</th>
+                                <th class="py-2 px-4 text-left">Ders</th>
+                                <th class="py-2 px-4 text-left">Öğretmen</th>
+                                <th class="py-2 px-4 text-left">Derslik</th>
+                                <th class="py-2 px-4 text-left">Durum</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTable" class="divide-y divide-gray-200">
+                            <!-- Filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Substitute Teachers -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-user-clock mr-2 text-blue-500"></i>
+                    Devamsız Öğretmenler
+                </h3>
+                <div id="substituteTeachers" class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-center text-yellow-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <span>Bugün devamsız öğretmen bulunmamaktadır.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duty Teachers -->
+            <div>
+                <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+                    <i class="fas fa-user-shield mr-2 text-blue-500"></i>
+                    Nöbetçi Öğretmenler
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="dutyTeachers">
+                    <!-- Filled by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Class Card Template -->
+    <template id="classCardTemplate">
+        <div class="class-card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 text-center cursor-pointer transition-all duration-300 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-20 h-20 rounded-full bg-blue-500 opacity-10"></div>
+            <div class="text-3xl font-bold text-blue-800 mb-2 class-name">5A</div>
+            <div class="text-sm text-gray-600 mb-3 teacher-name">Sınıf Öğretmeni: Mustafa TOPCAN</div>
+            <div class="text-xs bg-blue-200 text-blue-800 py-1 px-2 rounded-full inline-block current-lesson">
+                <i class="fas fa-book-open mr-1"></i>
+                <span>Şu an: Matematik</span>
+            </div>
+            <div class="mt-2 absent-teacher hidden">
+                <span class="text-xs bg-yellow-200 text-yellow-800 py-1 px-2 rounded-full inline-block">
+                    <i class="fas fa-exclamation-circle mr-1"></i>
+                    <span>1 Öğretmen Devamsız</span>
+                </span>
+            </div>
+        </div>
+    </template>
+    <script src="script.js"></script>
+</body>
+</html>
