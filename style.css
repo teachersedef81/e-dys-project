@@ -6,25 +6,6 @@ body {
     color: #333;
 }
 
-/* Giriş Sayfası Konteyneri */
-.login-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-#loginForm {
-    background-color: white;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-}
-
-/* Yönetim Paneli Stilleri */
 header {
     background-color: #005a9c;
     color: white;
@@ -32,6 +13,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 header a {
@@ -40,7 +22,7 @@ header a {
     font-weight: bold;
 }
 
-.dashboard-container {
+main.dashboard-container {
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -55,26 +37,36 @@ header a {
 }
 
 /* Form Elemanları */
-.form-group {
-    margin-bottom: 1.5rem;
-    text-align: left;
-}
+.form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group-half { flex: 1; min-width: 250px; }
 
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-}
+label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
 
-input[type="text"],
-input[type="password"],
-input[type="file"] {
+input[type="text"], input[type="password"], input[type="file"], select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Önemli */
+    box-sizing: border-box;
 }
+
+select {
+    background-color: white;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 0.65em auto;
+}
+
+select:disabled { background-color: #e9ecef; cursor: not-allowed; }
+fieldset { border: 1px solid #ddd; border-radius: 4px; padding: 1rem; }
+legend { font-weight: bold; padding: 0 0.5rem; color: #555; }
+.checkbox-group label { display: block; margin-bottom: 0.5rem; font-weight: normal; }
+.checkbox-group input[type="checkbox"] { margin-right: 0.5rem; }
 
 button {
     background-color: #007bff;
@@ -86,120 +78,68 @@ button {
     width: 100%;
     font-size: 1rem;
     font-weight: bold;
+    transition: background-color 0.2s;
 }
+button:hover { background-color: #0056b3; }
+button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-button:hover {
-    background-color: #0056b3;
+/* Profil Ayarları Stilleri */
+.profile-settings label { display: inline-block; margin-right: 1.5rem; font-weight: normal; }
+.profile-settings input[type="checkbox"] { margin-right: 0.5rem; }
+
+/* SEKMELİ YAPI STİLLERİ */
+.tab-nav {
+    display: flex;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: -2px; /* İçerikle birleşik görünsün */
+}
+.tab-btn {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    border-bottom: 2px solid transparent;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #555;
+    width: auto;
+    border-radius: 4px 4px 0 0;
+}
+.tab-btn.active {
+    color: #005a9c;
+    border: 2px solid #ccc;
+    border-bottom: 2px solid white;
+    background-color: white;
+}
+.tab-content {
+    display: none;
+    background-color: white;
+    padding: 2rem;
+    border: 2px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+}
+.tab-content.active {
+    display: block;
 }
 
 /* Tablo Stilleri */
-table {
+.document-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
 }
-
-th, td {
+.document-table th, .document-table td {
     padding: 12px;
     border-bottom: 1px solid #ddd;
     text-align: left;
 }
-
-th {
-    background-color: #f2f2f2;
-}
+.document-table th { background-color: #f8f9fa; }
+.document-table tr:hover { background-color: #f1f1f1; }
 
 /* Durum ve Buton Stilleri */
-.status-waiting {
-    color: #ff9800; /* Turuncu */
-    font-weight: bold;
-}
-
-.status-approved {
-    color: #4caf50; /* Yeşil */
-    font-weight: bold;
-}
-
-.action-btn {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    width: auto;
-}
-
-.approve-btn {
-    background-color: #4caf50;
-}
-
-.approve-btn:hover {
-    background-color: #45a049;
-}
-
-button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-/* style.css dosyasının sonuna eklenecek yeni stiller */
-
-/* Açılır menü (select) stilini diğer inputlarla aynı yapmak için */
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    background-color: white; /* iOS'taki varsayılan stili kaldırmak için */
-    -webkit-appearance: none; /* Chrome/Safari'deki varsayılan stili kaldırmak için */
-    -moz-appearance: none; /* Firefox'taki varsayılan stili kaldırmak için */
-    appearance: none;
-    /* Özel ok ikonu ekleme */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 0.65em auto;
-}
-
-/* Checkbox grupları için stiller */
-fieldset {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 1rem;
-}
-
-legend {
-    font-weight: bold;
-    padding: 0 0.5rem;
-    color: #555;
-}
-
-.checkbox-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: normal;
-}
-
-.checkbox-group input[type="checkbox"] {
-    margin-right: 0.5rem;
-}
-
-/* Tablodaki buton metnini ortalamak için */
-.action-btn {
-    min-width: 150px;
-    text-align: center;
-}
-/* style.css dosyasının sonuna eklenecek yeni stiller */
-
-.form-row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.form-group-half {
-    flex: 1;
-    min-width: 250px;
-}
-
-select:disabled {
-    background-color: #e9ecef;
-    cursor: not-allowed;
-}
+.status-waiting { color: #ff9800; font-weight: bold; }
+.status-approved { color: #4caf50; font-weight: bold; }
+.action-btn { padding: 8px 12px; font-size: 0.9rem; width: auto; min-width: 150px; text-align: center; }
+.approve-btn { background-color: #4caf50; }
+.approve-btn:hover { background-color: #45a049; }

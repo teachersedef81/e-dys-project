@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-DYS - Yönetim Paneli</title>
+    <title>E-DYS - Gelişmiş Yönetim Paneli</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,83 +13,103 @@
     </header>
 
     <main class="dashboard-container">
+
+        <section class="card">
+            <h2>Kullanıcı Profili (Simülasyon)</h2>
+            <p>Rollerinize göre ilgili sekmeler aşağıda belirecektir.</p>
+            <div class="profile-settings">
+                <label><input type="checkbox" id="isHomeroomTeacher"> Sınıf Rehber Öğretmeniyim</label>
+                <label><input type="checkbox" id="isClubAdvisor"> Kulüp Danışman Öğretmeniyim</label>
+            </div>
+        </section>
+
         <section class="card">
             <h2>Yeni Belge Yükle</h2>
             <form id="uploadForm">
-                <div class="form-group">
-                    <label for="documentType">Belge Türü</label>
-                    <select id="documentType" required>
-                        <option value="" disabled selected>Lütfen bir tür seçin...</option>
-                        <option value="Veli Toplantısı">Veli Toplantısı Tutanağı</option>
-                        <option value="Zümre Toplantısı">Zümre Toplantısı Kararları</option>
-                        <option value="Şube Öğretmenler Kurulu">Şube Öğretmenler Kurulu Kararları</option>
-                        <option value="Kulüp Dosyası">Kulüp Dosyası</option>
-                        <option value="Rehberlik Dosyası">Rehberlik Dosyası</option>
-                        <option value="Diğer">Diğer Evrak</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group form-group-half">
+                        <label for="mainCategory">Belge Kategorisi</label>
+                        <select id="mainCategory" required>
+                            <option value="" disabled selected>Ana kategori seçin...</option>
+                            <option value="idari">İdari Evraklar</option>
+                            <option value="rehberlik">Sınıf Rehberlik Evrakları</option>
+                            <option value="kulup">Kulüp Evrakları</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-half">
+                        <label for="documentType">Belge Türü</label>
+                        <select id="documentType" required disabled>
+                            <option value="">Önce kategori seçin...</option>
+                        </select>
+                    </div>
                 </div>
-
                 <div class="form-group">
                     <label for="documentFile">Word/PDF Dosyası Seçin</label>
                     <input type="file" id="documentFile" accept=".doc, .docx, .pdf" required>
                 </div>
-
                 <div class="form-group">
                     <fieldset>
                         <legend>Gönderilecek Gruplar (İmza/Onay)</legend>
                         <div class="checkbox-group">
-                            <label><input type="checkbox" name="recipient" value="Zümre Öğretmenleri"> Zümre Öğretmenleri (İmza için)</label>
-                            <label><input type="checkbox" name="recipient" value="Şube Öğretmenleri"> Sınıfın Diğer Öğretmenleri (İmza için)</label>
-                            <label><input type="checkbox" name="recipient" value="İdareciler"> İdareciler (Onay için)</label>
+                            <label><input type="checkbox" name="recipient" value="Zümre Öğretmenleri"> Zümre Öğretmenleri</label>
+                            <label><input type="checkbox" name="recipient" value="Şube Öğretmenleri"> Sınıfın Diğer Öğretmenleri</label>
+                            <label><input type="checkbox" name="recipient" value="İdareciler"> İdareciler</label>
                         </div>
                     </fieldset>
                 </div>
-
                 <button type="submit">Yükle ve Onaya Gönder</button>
             </form>
         </section>
 
-        <section class="card">
-    <h2>Yeni Belge Yükle</h2>
-    <form id="uploadForm">
-        <div class="form-row">
-            <div class="form-group form-group-half">
-                <label for="mainCategory">Belge Kategorisi</label>
-                <select id="mainCategory" required>
-                    <option value="" disabled selected>Ana kategori seçin...</option>
-                    <option value="idari">İdari Evraklar</option>
-                    <option value="rehberlik">Sınıf Rehberlik Evrakları</option>
-                    <option value="kulup">Kulüp Evrakları</option>
-                </select>
+        <div class="tabs-container">
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="idari">İdari Dosyam</button>
+                <button class="tab-btn" data-tab="rehberlik" id="rehberlikTabBtn" style="display: none;">Rehberlik Sınıfım</button>
+                <button class="tab-btn" data-tab="kulup" id="kulupTabBtn" style="display: none;">Kulübüm</button>
             </div>
 
-            <div class="form-group form-group-half">
-                <label for="documentType">Belge Türü</label>
-                <select id="documentType" required disabled>
-                    <option value="">Önce kategori seçin...</option>
-                </select>
+            <div class="tab-content active" id="idariContent">
+                <h3>İdari Dosyamdaki Belgeler</h3>
+                <table class="document-table">
+                    <thead>
+                        <tr>
+                            <th>Belge Adı</th><th>Belge Türü</th><th>Gönderilen Gruplar</th><th>Yükleyen</th><th>Tarih</th><th>Durum</th><th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Zümre Toplantı Kararları.pdf</td><td>İdari Evraklar / Zümre Öğretmenler Kurulu Tutanağı</td><td>Zümre Öğretmenleri</td><td>Fatma Öztürk</td><td>28.08.2024</td><td class="status-approved">Tamamlandı</td><td><button class="action-btn" disabled>Onaylandı</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-content" id="rehberlikContent">
+                <h3>Rehberlik Sınıfı Belgelerim</h3>
+                <table class="document-table">
+                    <thead>
+                         <tr>
+                            <th>Belge Adı</th><th>Belge Türü</th><th>Gönderilen Gruplar</th><th>Yükleyen</th><th>Tarih</th><th>Durum</th><th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                         </tbody>
+                </table>
+            </div>
+
+            <div class="tab-content" id="kulupContent">
+                <h3>Kulüp Dosyamdaki Belgeler</h3>
+                 <table class="document-table">
+                    <thead>
+                         <tr>
+                            <th>Belge Adı</th><th>Belge Türü</th><th>Gönderilen Gruplar</th><th>Yükleyen</th><th>Tarih</th><th>Durum</th><th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
             </div>
         </div>
-
-        <div class="form-group">
-            <label for="documentFile">Word/PDF Dosyası Seçin</label>
-            <input type="file" id="documentFile" accept=".doc, .docx, .pdf" required>
-        </div>
-
-        <div class="form-group">
-            <fieldset>
-                <legend>Gönderilecek Gruplar (İmza/Onay)</legend>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" name="recipient" value="Zümre Öğretmenleri"> Zümre Öğretmenleri (İmza için)</label>
-                    <label><input type="checkbox" name="recipient" value="Şube Öğretmenleri"> Sınıfın Diğer Öğretmenleri (İmza için)</label>
-                    <label><input type="checkbox" name="recipient" value="İdareciler"> İdareciler (Onay için)</label>
-                </div>
-            </fieldset>
-        </div>
-
-        <button type="submit">Yükle ve Onaya Gönder</button>
-    </form>
-</section>
     </main>
 
     <script src="script.js"></script>
