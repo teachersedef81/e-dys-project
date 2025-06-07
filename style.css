@@ -186,3 +186,20 @@ legend {
     min-width: 150px;
     text-align: center;
 }
+/* style.css dosyasının sonuna eklenecek yeni stiller */
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.form-group-half {
+    flex: 1;
+    min-width: 250px;
+}
+
+select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
