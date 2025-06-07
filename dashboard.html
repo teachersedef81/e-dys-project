@@ -17,9 +17,34 @@
             <h2>Yeni Belge Yükle</h2>
             <form id="uploadForm">
                 <div class="form-group">
-                    <label for="documentFile">Word/PDF Dosyası Seçin:</label>
+                    <label for="documentType">Belge Türü</label>
+                    <select id="documentType" required>
+                        <option value="" disabled selected>Lütfen bir tür seçin...</option>
+                        <option value="Veli Toplantısı">Veli Toplantısı Tutanağı</option>
+                        <option value="Zümre Toplantısı">Zümre Toplantısı Kararları</option>
+                        <option value="Şube Öğretmenler Kurulu">Şube Öğretmenler Kurulu Kararları</option>
+                        <option value="Kulüp Dosyası">Kulüp Dosyası</option>
+                        <option value="Rehberlik Dosyası">Rehberlik Dosyası</option>
+                        <option value="Diğer">Diğer Evrak</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="documentFile">Word/PDF Dosyası Seçin</label>
                     <input type="file" id="documentFile" accept=".doc, .docx, .pdf" required>
                 </div>
+
+                <div class="form-group">
+                    <fieldset>
+                        <legend>Gönderilecek Gruplar (İmza/Onay)</legend>
+                        <div class="checkbox-group">
+                            <label><input type="checkbox" name="recipient" value="Zümre Öğretmenleri"> Zümre Öğretmenleri (İmza için)</label>
+                            <label><input type="checkbox" name="recipient" value="Şube Öğretmenleri"> Sınıfın Diğer Öğretmenleri (İmza için)</label>
+                            <label><input type="checkbox" name="recipient" value="İdareciler"> İdareciler (Onay için)</label>
+                        </div>
+                    </fieldset>
+                </div>
+
                 <button type="submit">Yükle ve Onaya Gönder</button>
             </form>
         </section>
@@ -30,6 +55,8 @@
                 <thead>
                     <tr>
                         <th>Belge Adı</th>
+                        <th>Belge Türü</th>
+                        <th>Gönderilen Gruplar</th>
                         <th>Yükleyen</th>
                         <th>Tarih</th>
                         <th>Durum</th>
@@ -39,23 +66,29 @@
                 <tbody>
                     <tr>
                         <td>Haftalık Ders Planı.docx</td>
+                        <td>Diğer</td>
+                        <td>Zümre Öğretmenleri, İdareciler</td>
                         <td>Ayşe Yılmaz</td>
                         <td>01.09.2024</td>
                         <td class="status-waiting">Onay Bekliyor</td>
-                        <td><button class="action-btn approve-btn">Okudum, Onaylıyorum</button></td>
+                        <td><button class="action-btn approve-btn">İncele ve Onayla</button></td>
                     </tr>
                     <tr>
                         <td>Veli Toplantı Tutanağı.pdf</td>
+                        <td>Veli Toplantısı</td>
+                        <td>İdareciler</td>
                         <td>Mehmet Kaya</td>
                         <td>30.08.2024</td>
                         <td class="status-waiting">Onay Bekliyor</td>
-                        <td><button class="action-btn approve-btn">Okudum, Onaylıyorum</button></td>
+                        <td><button class="action-btn approve-btn">İncele ve Onayla</button></td>
                     </tr>
                     <tr>
                         <td>Zümre Toplantı Kararları.pdf</td>
+                        <td>Zümre Toplantısı</td>
+                        <td>Zümre Öğretmenleri</td>
                         <td>Fatma Öztürk</td>
                         <td>28.08.2024</td>
-                        <td class="status-approved">Onaylandı</td>
+                        <td class="status-approved">Tamamlandı</td>
                         <td><button class="action-btn" disabled>Onaylandı</button></td>
                     </tr>
                 </tbody>
