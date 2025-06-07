@@ -143,3 +143,57 @@ button:disabled { background-color: #ccc; cursor: not-allowed; }
 .action-btn { padding: 8px 12px; font-size: 0.9rem; width: auto; min-width: 150px; text-align: center; }
 .approve-btn { background-color: #4caf50; }
 .approve-btn:hover { background-color: #45a049; }
+
+/* ==================
+   Footer Stil Tanımlamaları
+   ================== */
+
+/* Sayfa içeriği kısa olsa bile footer'ın altta kalmasını sağlamak için body'ye ekleyin */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.dashboard-container {
+    flex-grow: 1; /* main alanının mevcut boşluğu doldurmasını sağlar */
+}
+
+footer {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 20px 40px;
+    text-align: center;
+    border-top: 1px solid #dee2e6;
+    margin-top: 30px; /* Ana içerikle arasında boşluk bırakır */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Küçük ekranlarda alt alta gelmesi için */
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+.footer-links a {
+    color: #0056b3;
+    text-decoration: none;
+    margin: 0 10px;
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* Küçük ekranlar için medya sorgusu */
+@media (max-width: 768px) {
+    footer {
+        flex-direction: column;
+        justify-content: center;
+    }
+    .footer-links {
+        margin-top: 10px;
+    }
+}

@@ -4,115 +4,744 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-DYS - Gelişmiş Yönetim Paneli</title>
-    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+            --background-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            gap: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Profile Settings */
+        .profile-settings {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--background-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-group:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            accent-color: var(--primary-color);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-input:disabled, .form-select:disabled {
+            background: var(--background-color);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* File Upload */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            background: var(--background-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .file-upload.has-file .file-upload-label {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        /* Recipients */
+        .recipients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .recipient-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--background-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .recipient-option:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .recipient-option.selected {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            background: var(--card-bg);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 2rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+        }
+
+        .table th {
+            background: var(--background-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tr:hover {
+            background: var(--background-color);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-waiting {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-rejected {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                padding: 0 1rem;
+            }
+            
+            .tab-nav {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <img src="images/meb-logo.jpeg" alt="Meb Logo">
-        <h1>Eğitimde Doküman Takip Sistemi</h1>
-        <a href="index.html">Çıkış Yap</a>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiNmZmZmZmYiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzZWIiIHN0cm9rZS13aWR0aD0iMiI+CjxwYXRoIGQ9Im0xNiAxNiA0LTQtNC00Ii8+CjxwYXRoIGQ9Im0xMiAxNiA0LTQtNC00Ii8+CjxwYXRoIGQ9Im0xMyAyMC00LTQgNC00Ii8+Cjwvc3ZnPgo8L3N2Zz4K" alt="Logo" class="logo">
+                <h1 class="header-title">E-DYS</h1>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <main class="dashboard-container">
-
-        <section class="card">
-            <h2>Kullanıcı Profili (Simülasyon)</h2>
-            <p>Rollerinize göre ilgili sekmeler aşağıda belirecektir.</p>
-            <div class="profile-settings">
-                <label><input type="checkbox" id="isHomeroomTeacher"> Sınıf Rehber Öğretmeniyim</label>
-                <label><input type="checkbox" id="isClubAdvisor"> Kulüp Danışman Öğretmeniyim</label>
+    <main class="main-container">
+        <!-- Profile Settings -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-user-cog"></i>
+                    Kullanıcı Profili
+                </h2>
             </div>
-        </section>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                Rollerinize göre ilgili sekmeler aşağıda belirecektir.
+            </p>
+            <div class="profile-settings">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="isHomeroomTeacher">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    Sınıf Rehber Öğretmeniyim
+                </label>
+                <label class="checkbox-group">
+                    <input type="checkbox" id="isClubAdvisor">
+                    <i class="fas fa-users"></i>
+                    Kulüp Danışman Öğretmeniyim
+                </label>
+            </div>
+        </div>
 
-        <section class="card">
-            <h2>Yeni Belge Yükle</h2>
+        <!-- Document Upload -->
+        <div class="card fade-in">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-upload"></i>
+                    Yeni Belge Yükle
+                </h2>
+            </div>
             <form id="uploadForm">
-                <div class="form-row">
-                    <div class="form-group form-group-half">
-                        <label for="mainCategory">Belge Kategorisi</label>
-                        <select id="mainCategory" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="mainCategory">Belge Kategorisi</label>
+                        <select id="mainCategory" class="form-select" required>
                             <option value="" disabled selected>Ana kategori seçin...</option>
                             <option value="idari">İdari Evraklar</option>
                             <option value="rehberlik">Sınıf Rehberlik Evrakları</option>
                             <option value="kulup">Kulüp Evrakları</option>
                         </select>
                     </div>
-                    <div class="form-group form-group-half">
-                        <label for="documentType">Belge Türü</label>
-                        <select id="documentType" required disabled>
+                    <div class="form-group">
+                        <label class="form-label" for="documentType">Belge Türü</label>
+                        <select id="documentType" class="form-select" required disabled>
                             <option value="">Önce kategori seçin...</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="documentFile">Word/PDF Dosyası Seçin</label>
-                    <input type="file" id="documentFile" accept=".doc, .docx, .pdf" required>
-                </div>
-                <div class="form-group">
-                    <fieldset>
-                        <legend>Gönderilecek Gruplar (İmza/Onay)</legend>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="recipient" value="Zümre Öğretmenleri"> Zümre Öğretmenleri</label>
-                            <label><input type="checkbox" name="recipient" value="Şube Öğretmenleri"> Sınıfın Diğer Öğretmenleri</label>
-                            <label><input type="checkbox" name="recipient" value="İdareciler"> İdareciler</label>
-                        </div>
-                    </fieldset>
-                </div>
-                <button type="submit">Yükle ve Onaya Gönder</button>
-            </form>
-        </section>
 
-        <div class="tabs-container">
+                <div class="form-group">
+                    <label class="form-label">Dosya Seçin</label>
+                    <div class="file-upload" id="fileUpload">
+                        <input type="file" id="documentFile" class="file-upload-input" accept=".doc,.docx,.pdf" required>
+                        <label for="documentFile" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span id="fileUploadText">Dosya seçin veya buraya sürükleyin</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Gönderilecek Gruplar</label>
+                    <div class="recipients-grid">
+                        <label class="recipient-option">
+                            <input type="checkbox" name="recipient" value="Zümre Öğretmenleri">
+                            <i class="fas fa-user-graduate"></i>
+                            Zümre Öğretmenleri
+                        </label>
+                        <label class="recipient-option">
+                            <input type="checkbox" name="recipient" value="Şube Öğretmenleri">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Sınıfın Diğer Öğretmenleri
+                        </label>
+                        <label class="recipient-option">
+                            <input type="checkbox" name="recipient" value="İdareciler">
+                            <i class="fas fa-user-tie"></i>
+                            İdareciler
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    Yükle ve Onaya Gönder
+                </button>
+            </form>
+        </div>
+
+        <<div class="tabs-container fade-in">
             <div class="tab-nav">
-                <button class="tab-btn active" data-tab="idari">İdari Dosyam</button>
-                <button class="tab-btn" data-tab="rehberlik" id="rehberlikTabBtn" style="display: none;">Rehberlik Sınıfım</button>
-                <button class="tab-btn" data-tab="kulup" id="kulupTabBtn" style="display: none;">Kulübüm</button>
+                <button class="tab-btn active" data-tab="idari">
+                    <i class="fas fa-folder"></i>
+                    İdari Dosyam
+                </button>
+                <button class="tab-btn" data-tab="rehberlik" id="rehberlikTabBtn" style="display: none;">
+                    <i class="fas fa-school"></i>
+                    Rehberlik Sınıfım
+                </button>
+                <button class="tab-btn" data-tab="kulup" id="kulupTabBtn" style="display: none;">
+                    <i class="fas fa-users"></i>
+                    Kulübüm
+                </button>
             </div>
 
             <div class="tab-content active" id="idariContent">
-                <h3>İdari Dosyamdaki Belgeler</h3>
-                <table class="document-table">
-                    <thead>
-                        <tr>
-                            <th>Belge Adı</th><th>Belge Türü</th><th>Gönderilen Gruplar</th><th>Yükleyen</th><th>Tarih</th><th>Durum</th><th>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Zümre Toplantı Kararları.pdf</td><td>İdari Evraklar / Zümre Öğretmenler Kurulu Tutanağı</td><td>Zümre Öğretmenleri</td><td>Fatma Öztürk</td><td>28.08.2024</td><td class="status-approved">Tamamlandı</td><td><button class="action-btn" disabled>Onaylandı</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Belge Adı</th>
+                                <th>Belge Türü</th>
+                                <th>Gönderilen Gruplar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="tab-content" id="rehberlikContent">
-                <h3>Rehberlik Sınıfı Belgelerim</h3>
-                <table class="document-table">
-                    <thead>
-                         <tr>
-                            <th>Belge Adı</th><th>Belge Türü</th><th>Gönderilen Gruplar</th><th>Yükleyen</th><th>Tarih</th><th>Durum</th><th>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                         </tbody>
-                </table>
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Belge Adı</th>
+                                <th>Belge Türü</th>
+                                <th>Gönderilen Gruplar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="tab-content" id="kulupContent">
-                <h3>Kulüp Dosyamdaki Belgeler</h3>
-                 <table class="document-table">
-                    <thead>
-                         <tr>
-                            <th>Belge Adı</th><th>Belge Türü</th><th>Gönderilen Gruplar</th><th>Yükleyen</th><th>Tarih</th><th>Durum</th><th>İşlem</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
+                 <div class="table-container">
+                    <table class="table">
+                        <thead>
+                             <tr>
+                                <th>Belge Adı</th>
+                                <th>Belge Türü</th>
+                                <th>Gönderilen Gruplar</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <div id="notificationContainer"></div>
+
+        
+    <footer>
+        <p>&copy; 2025 Milli Eğitim Bakanlığı | E-DYS - Eğitimde Doküman Takip Sistemi</p>
+        <div class="footer-links">
+            <a href="#">Hakkında</a>
+            <a href="#">Yardım</a>
+            <a href="#">Gizlilik Politikası</a>
+        </div>
+    </footer>
+    <script src="script.js"></script> ```
+  
 </body>
 </html>
+
+   

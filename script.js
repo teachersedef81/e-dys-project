@@ -1,131 +1,234 @@
 document.addEventListener('DOMContentLoaded', () => {
-
     // --- ELEMENT REFERANSLARI ---
+    const themeToggle = document.getElementById('themeToggle');
     const homeroomCheckbox = document.getElementById('isHomeroomTeacher');
     const clubCheckbox = document.getElementById('isClubAdvisor');
     const rehberlikTabBtn = document.getElementById('rehberlikTabBtn');
     const kulupTabBtn = document.getElementById('kulupTabBtn');
     const tabNav = document.querySelector('.tab-nav');
-    const tabContents = document.querySelectorAll('.tab-content');
     const uploadForm = document.getElementById('uploadForm');
     const mainCategorySelect = document.getElementById('mainCategory');
     const documentTypeSelect = document.getElementById('documentType');
+    const fileUpload = document.getElementById('fileUpload');
+    const fileUploadInput = document.getElementById('documentFile');
+    const fileUploadText = document.getElementById('fileUploadText');
+    const submitBtn = document.getElementById('submitBtn');
 
-    // --- BELGE TÜRÜ VERİLERİ ---
+    // --- VERİ YÖNETİMİ ---
     const documentTypes = {
-        idari: ["Yıllık İş Günü Çalışma Takvimi", "Ünitelendirilmiş Yıllık Plan", "Günlük Plan", "Haftalık Ders Programı", "Şube Öğretmenler Kurulu Tutanağı", "Zümre Öğretmenler Kurulu Tutanağı", "İl/İlçe Zümre Toplantı Tutanağı", "Proje Ödevi Çizelgesi/Ölçeği", "Ders İçi Performans Değerlendirme Ölçeği", "Gezi-Gözlem Planı", "Ortak Sınav Soruları ve Cevap Anahtarı", "Sınıfların Güncel Listesi", "Ortak Sınav Analiz Sonuçları", "Egzersiz Dosyası", "Diğer İdari Evraklar"],
-        rehberlik: ["Şubenin Haftalık Ders Programı", "Sınıf Listesi", "Oturma Planı", "Uygulanan Test-Anket Formları", "Veli İletişim Bilgileri", "Veli Toplantı Tutanağı", "Öğrenci Tanıma ve Gözlem Formları", "Diğer Rehberlik Evrakları"],
-        kulup: ["Sosyal Kulüp Öğrenci Listesi", "Sosyal Kulüp Yıllık Çalışma Planı", "Kulüp Toplantı Tutanağı", "Kulüp Görev Dağılım Çizelgesi", "Belirli Gün ve Haftalar Çizelgesi", "Diğer Kulüp Evrakları"]
+        idari: ["Yıllık İş Günü Çalışma Takvimi", "Ünitelendirilmiş Yıllık Plan", "Günlük Plan", "Haftalık Ders Programı", "Şube Öğretmenler Kurulu Tutanağı", "Zümre Öğretmenler Kurulu Tutanağı", "Diğer İdari Evraklar"],
+        rehberlik: ["Sınıf Rehberlik Yıllık Planı", "Öğrenci Gözlem Formu", "Veli Görüşme Formu", "Risk Haritası Anket Sonuçları", "Diğer Rehberlik Evrakları"],
+        kulup: ["Kulüp Yıllık Çalışma Planı", "Kulüp Karar Defteri Örneği", "Sosyal Etkinlik Formu", "Kulüp Üye Listesi", "Diğer Kulüp Evrakları"]
     };
 
-    // --- OLAY DİNLEYİCİLERİ ---
-
-    // Rol seçim kutularını dinle
-    homeroomCheckbox.addEventListener('change', () => toggleTabVisibility(rehberlikTabBtn, homeroomCheckbox.checked));
-    clubCheckbox.addEventListener('change', () => toggleTabVisibility(kulupTabBtn, clubCheckbox.checked));
-
-    // Sekme navigasyonunu dinle (Event Delegation)
-    tabNav.addEventListener('click', (e) => {
-        if (e.target.matches('.tab-btn')) {
-            switchTab(e.target.dataset.tab);
-        }
-    });
-    
-    // Ana kategori seçimini dinle (Form için)
-    mainCategorySelect.addEventListener('change', populateDocumentTypes);
-
-    // Form gönderme işlemini dinle
-    uploadForm.addEventListener('submit', handleFormSubmit);
-
-    // Tüm tablolardaki onay butonlarını dinle (Event Delegation)
-    document.querySelector('main.dashboard-container').addEventListener('click', (e) => {
-        if (e.target.matches('.approve-btn')) {
-            handleApproval(e.target);
-        }
-    });
+    // LocalStorage'dan belgeleri al veya boş bir dizi oluştur
+    let documents = JSON.parse(localStorage.getItem('documents')) || [];
 
     // --- FONKSİYONLAR ---
 
-    // Sekme görünürlüğünü ayarla
-    function toggleTabVisibility(tabButton, isVisible) {
-        tabButton.style.display = isVisible ? 'inline-block' : 'none';
-        // Eğer gizlenen sekme aktifse, varsayılan sekmeye dön
-        if (!isVisible && tabButton.classList.contains('active')) {
-            switchTab('idari');
-        }
-    }
-    
-    // Sekmeler arası geçiş yap
-    function switchTab(tabId) {
-        tabContents.forEach(content => content.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    // 1. TEMA YÖNETİMİ
+    const applyTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+        themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', theme);
+    };
 
-        document.getElementById(`${tabId}Content`).classList.add('active');
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+    });
+
+    // 2. BELGELERİ EKRANA ÇİZME (RENDER)
+    const renderDocuments = () => {
+        // Tüm tabloların içini temizle
+        document.querySelectorAll('.table tbody').forEach(tbody => tbody.innerHTML = '');
+
+        if (documents.length === 0) {
+            // Eğer hiç belge yoksa tüm tablolara boş durum mesajı ekle
+            document.querySelector('#idariContent tbody').innerHTML = getEmptyStateHTML('idari');
+            document.querySelector('#rehberlikContent tbody').innerHTML = getEmptyStateHTML('rehberlik');
+            document.querySelector('#kulupContent tbody').innerHTML = getEmptyStateHTML('kulup');
+            return;
+        }
+
+        documents.forEach(doc => {
+            const targetTableBody = document.querySelector(`#${doc.category}Content tbody`);
+            if (targetTableBody) {
+                 // Eğer tablo boş ise, boş mesajını kaldır
+                if (targetTableBody.querySelector('.empty-state')) {
+                    targetTableBody.innerHTML = '';
+                }
+                const row = document.createElement('tr');
+                row.className = 'fade-in';
+                row.innerHTML = `
+                    <td>${getIconForFile(doc.name)} ${doc.name}</td>
+                    <td>${doc.type}</td>
+                    <td>${doc.recipients}</td>
+                    <td>${doc.date}</td>
+                    <td><span class="status-badge ${getStatusClass(doc.status)}">${getStatusIcon(doc.status)} ${doc.status}</span></td>
+                    <td>
+                        ${doc.status === 'Bekliyor' ? `
+                            <button class="btn btn-success btn-sm approve-btn" data-id="${doc.id}"><i class="fas fa-check"></i> Onayla</button>
+                            <button class="btn btn-danger btn-sm reject-btn" data-id="${doc.id}"><i class="fas fa-times"></i> Reddet</button>
+                        ` : `<button class="btn btn-secondary btn-sm" disabled><i class="fas fa-lock"></i> Kilitli</button>`}
+                    </td>
+                `;
+                targetTableBody.appendChild(row);
+            }
+        });
+
+         // Belge eklendikten sonra hala boş olan tablolara boş mesajı ekle
+        document.querySelectorAll('.table tbody').forEach(tbody => {
+            if (tbody.children.length === 0) {
+                const category = tbody.closest('.tab-content').id.replace('Content', '');
+                tbody.innerHTML = getEmptyStateHTML(category);
+            }
+        });
+    };
+
+    // 3. BELGE İŞLEMLERİ (Onay, Red, Ekleme)
+    document.querySelector('.main-container').addEventListener('click', e => {
+        const target = e.target.closest('button');
+        if (!target) return;
+
+        const docId = target.dataset.id;
+        if (target.classList.contains('approve-btn')) updateDocumentStatus(docId, 'Onaylandı');
+        if (target.classList.contains('reject-btn')) updateDocumentStatus(docId, 'Reddedildi');
+    });
+    
+    const updateDocumentStatus = (id, newStatus) => {
+        documents = documents.map(doc => doc.id === id ? { ...doc, status: newStatus } : doc);
+        localStorage.setItem('documents', JSON.stringify(documents));
+        renderDocuments();
+        showNotification(`Belge başarıyla "${newStatus}" olarak işaretlendi.`, 'success');
+    };
+
+    // 4. FORM YÖNETİMİ
+    uploadForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const newDocument = {
+            id: 'doc_' + Date.now(),
+            category: mainCategorySelect.value,
+            type: `${mainCategorySelect.options[mainCategorySelect.selectedIndex].text} / ${documentTypeSelect.value}`,
+            name: fileUploadInput.files[0].name,
+            recipients: Array.from(document.querySelectorAll('input[name="recipient"]:checked')).map(cb => cb.value).join(', '),
+            date: new Date().toLocaleDateString('tr-TR'),
+            status: 'Bekliyor'
+        };
+
+        if (!newDocument.recipients) {
+            showNotification('Lütfen en az bir gönderilecek grup seçin.', 'warning');
+            return;
+        }
+
+        submitBtn.innerHTML = '<span class="loading"></span> Yükleniyor...';
+        submitBtn.disabled = true;
+
+        setTimeout(() => { // Sunucuya yükleme simülasyonu
+            documents.push(newDocument);
+            localStorage.setItem('documents', JSON.stringify(documents));
+            renderDocuments();
+            switchTab(newDocument.category); // İlgili sekmeye geçiş yap
+            uploadForm.reset();
+            documentTypeSelect.innerHTML = '<option value="">Önce kategori seçin...</option>';
+            documentTypeSelect.disabled = true;
+            fileUploadText.textContent = 'Dosya seçin veya buraya sürükleyin';
+            fileUpload.classList.remove('has-file');
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Yükle ve Onaya Gönder';
+            submitBtn.disabled = false;
+            showNotification('Belge başarıyla yüklendi ve onaya gönderildi!', 'success');
+        }, 1000);
+    });
+
+    // 5. DOSYA YÜKLEME VE SÜRÜKLE-BIRAK
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => fileUpload.addEventListener(eventName, e => e.preventDefault(), false));
+
+    fileUpload.addEventListener('dragover', () => fileUpload.classList.add('is-dragging'));
+    fileUpload.addEventListener('dragleave', () => fileUpload.classList.remove('is-dragging'));
+    fileUpload.addEventListener('drop', e => {
+        fileUpload.classList.remove('is-dragging');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileUploadInput.files = files;
+            updateFileUploadUI(files[0].name);
+        }
+    });
+    fileUploadInput.addEventListener('change', () => {
+        if (fileUploadInput.files.length > 0) {
+            updateFileUploadUI(fileUploadInput.files[0].name);
+        }
+    });
+
+    const updateFileUploadUI = (fileName) => {
+        fileUploadText.innerHTML = `<i class="fas fa-check-circle" style="color: var(--success-color);"></i> ${fileName}`;
+        fileUpload.classList.add('has-file');
+    };
+
+    // 6. YARDIMCI FONKSİYONLAR (İkon, Durum, Bildirim vb.)
+    const getIconForFile = (fileName) => {
+        const ext = fileName.split('.').pop().toLowerCase();
+        if (ext === 'pdf') return '<i class="fas fa-file-pdf" style="color: #ef4444; margin-right: 0.5rem;"></i>';
+        if (['doc', 'docx'].includes(ext)) return '<i class="fas fa-file-word" style="color: #2563eb; margin-right: 0.5rem;"></i>';
+        return '<i class="fas fa-file" style="color: #64748b; margin-right: 0.5rem;"></i>';
+    };
+
+    const getStatusClass = (status) => ({ 'Bekliyor': 'status-waiting', 'Onaylandı': 'status-approved', 'Reddedildi': 'status-rejected' }[status]);
+    const getStatusIcon = (status) => ({ 'Bekliyor': '<i class="fas fa-hourglass-half"></i>', 'Onaylandı': '<i class="fas fa-check-circle"></i>', 'Reddedildi': '<i class="fas fa-times-circle"></i>' }[status]);
+    
+    const getEmptyStateHTML = (category) => {
+        const icons = { idari: 'fa-folder-open', rehberlik: 'fa-school', kulup: 'fa-users' };
+        const texts = { idari: 'idari', rehberlik: 'rehberlik', kulup: 'kulüp' };
+        return `<tr><td colspan="6" class="empty-state"><i class="fas ${icons[category]}"></i><div>Henüz ${texts[category]} belgesi yüklenmemiş</div></td></tr>`;
+    };
+
+    const showNotification = (message, type = 'success') => {
+        const container = document.getElementById('notificationContainer') || document.body;
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+        container.appendChild(notification);
+        setTimeout(() => notification.classList.add('show'), 10);
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    };
+
+    // 7. SEKME YÖNETİMİ
+    const toggleTabVisibility = (tabButton, isVisible) => {
+        tabButton.style.display = isVisible ? 'flex' : 'none';
+        if (!isVisible && tabButton.classList.contains('active')) switchTab('idari');
+    };
+
+    const switchTab = (tabId) => {
+        document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
         document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-    }
+        document.getElementById(`${tabId}Content`).classList.add('active');
+    };
 
-    // Belge türü menüsünü doldur
-    function populateDocumentTypes() {
-        const selectedCategory = mainCategorySelect.value;
-        documentTypeSelect.innerHTML = '<option value="">Lütfen belge türü seçin...</option>';
-        documentTypeSelect.disabled = true;
-
-        if (selectedCategory && documentTypes[selectedCategory]) {
-            documentTypes[selectedCategory].forEach(type => {
-                const option = new Option(type, type);
-                documentTypeSelect.add(option);
-            });
-            documentTypeSelect.disabled = false;
-        }
-    }
-    
-    // Form gönderme işlemini yönet
-    function handleFormSubmit(event) {
-        event.preventDefault();
-        const mainCategoryText = mainCategorySelect.options[mainCategorySelect.selectedIndex].text;
-        const documentType = documentTypeSelect.value;
-        const documentFile = document.getElementById('documentFile').files[0];
-        const recipientCheckboxes = document.querySelectorAll('input[name="recipient"]:checked');
-
-        // Doğrulamalar
-        if (!documentType) { alert('Lütfen bir belge türü seçin.'); return; }
-        if (recipientCheckboxes.length === 0) { alert('Lütfen en az bir gönderilecek grup seçin.'); return; }
-        if (!documentFile) { alert('Lütfen bir dosya seçin.'); return; }
-
-        const recipients = Array.from(recipientCheckboxes).map(cb => cb.value).join(', ');
+    // --- BAŞLANGIÇ (INITIALIZATION) ---
+    const init = () => {
+        // Olay Dinleyicilerini Kur
+        homeroomCheckbox.addEventListener('change', () => toggleTabVisibility(rehberlikTabBtn, homeroomCheckbox.checked));
+        clubCheckbox.addEventListener('change', () => toggleTabVisibility(kulupTabBtn, clubCheckbox.checked));
+        tabNav.addEventListener('click', e => e.target.matches('.tab-btn') && switchTab(e.target.dataset.tab));
+        mainCategorySelect.addEventListener('change', () => {
+             const selectedCategory = mainCategorySelect.value;
+             documentTypeSelect.innerHTML = '<option value="">Önce kategori seçin...</option>';
+             documentTypeSelect.disabled = true;
+             if (selectedCategory && documentTypes[selectedCategory]) {
+                 documentTypeSelect.innerHTML = '<option value="" disabled selected>Belge türü seçin...</option>';
+                 documentTypes[selectedCategory].forEach(type => documentTypeSelect.add(new Option(type, type)));
+                 documentTypeSelect.disabled = false;
+             }
+        });
         
-        // Aktif olan sekmenin tablosunu bul
-        const activeTableBody = document.querySelector('.tab-content.active table tbody');
-        if (!activeTableBody) {
-             alert('Hata: Aktif tablo bulunamadı.');
-             return;
-        }
+        // Kayıtlı temayı uygula
+        applyTheme(localStorage.getItem('theme') || 'light');
+        
+        // Kayıtlı belgeleri ekrana çiz
+        renderDocuments();
+    };
 
-        const newRow = activeTableBody.insertRow(0); // Başa ekle
-        newRow.innerHTML = `
-            <td>${documentFile.name}</td>
-            <td>${mainCategoryText} / ${documentType}</td>
-            <td>${recipients}</td>
-            <td>Siz (Kullanıcı)</td>
-            <td>${new Date().toLocaleDateString('tr-TR')}</td>
-            <td class="status-waiting">Onay Bekliyor</td>
-            <td><button class="action-btn approve-btn">İncele ve Onayla</button></td>
-        `;
-
-        uploadForm.reset();
-        populateDocumentTypes(); // Menüyü sıfırla
-        alert('Belge başarıyla aktif dosyaya eklendi ve onaya gönderildi!');
-    }
-
-    // Onaylama işlemini yönet
-    function handleApproval(button) {
-        const row = button.closest('tr');
-        const statusCell = row.cells[5]; // Durum hücresi (6. sütun)
-        statusCell.textContent = 'Tamamlandı';
-        statusCell.className = 'status-approved';
-        button.textContent = 'Onaylandı';
-        button.disabled = true;
-        alert(`"${row.cells[0].textContent}" adlı belge onaylandı!`);
-    }
-
+    init(); // Uygulamayı başlat
 });
