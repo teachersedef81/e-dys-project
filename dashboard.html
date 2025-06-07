@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-DYS - Yönetim Paneli</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Eğitimde Doküman Takip Sistemi</h1>
+        <a href="index.html">Çıkış Yap</a>
+    </header>
+
+    <main class="dashboard-container">
+        <section class="card">
+            <h2>Yeni Belge Yükle</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="documentFile">Word/PDF Dosyası Seçin:</label>
+                    <input type="file" id="documentFile" accept=".doc, .docx, .pdf" required>
+                </div>
+                <button type="submit">Yükle ve Onaya Gönder</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Onay Bekleyen Belgeler</h2>
+            <table id="documentTable">
+                <thead>
+                    <tr>
+                        <th>Belge Adı</th>
+                        <th>Yükleyen</th>
+                        <th>Tarih</th>
+                        <th>Durum</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Haftalık Ders Planı.docx</td>
+                        <td>Ayşe Yılmaz</td>
+                        <td>01.09.2024</td>
+                        <td class="status-waiting">Onay Bekliyor</td>
+                        <td><button class="action-btn approve-btn">Okudum, Onaylıyorum</button></td>
+                    </tr>
+                    <tr>
+                        <td>Veli Toplantı Tutanağı.pdf</td>
+                        <td>Mehmet Kaya</td>
+                        <td>30.08.2024</td>
+                        <td class="status-waiting">Onay Bekliyor</td>
+                        <td><button class="action-btn approve-btn">Okudum, Onaylıyorum</button></td>
+                    </tr>
+                    <tr>
+                        <td>Zümre Toplantı Kararları.pdf</td>
+                        <td>Fatma Öztürk</td>
+                        <td>28.08.2024</td>
+                        <td class="status-approved">Onaylandı</td>
+                        <td><button class="action-btn" disabled>Onaylandı</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
