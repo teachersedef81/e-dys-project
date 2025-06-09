@@ -1,0 +1,174 @@
+/* admin-style.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ----- KÖK DEĞİŞKENLER VE TEMEL AYARLAR ----- */
+:root {
+    --primary-color: #2563eb;
+    --primary-dark: #1d4ed8;
+    --sidebar-bg: #1e293b;
+    --content-bg: #f1f5f9;
+    --card-bg: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-light: #f8fafc;
+    --border-color: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    --sidebar-width: 260px;
+}
+
+[data-theme="dark"] {
+    --primary-color: #3b82f6;
+    --sidebar-bg: #0f172a;
+    --content-bg: #020617;
+    --card-bg: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--content-bg);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ----- DASHBOARD ANA YERLEŞİMİ ----- */
+.dashboard-layout {
+    display: flex;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    color: var(--text-light);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width));
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+/* ----- SIDEBAR (SOL MENÜ) ----- */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.sidebar-logo { width: 40px; height: 40px; border-radius: 8px; }
+.sidebar-title { font-size: 1.25rem; font-weight: 600; }
+.sidebar-nav { flex-grow: 1; overflow-y: auto; }
+.sidebar-nav ul { list-style: none; }
+.sidebar-nav li a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.sidebar-nav li a:hover, .sidebar-nav li a.active {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+    border-left: 3px solid var(--primary-color);
+    padding-left: calc(1.5rem - 3px);
+}
+.sidebar-nav li a i { width: 20px; text-align: center; font-size: 1.1rem; }
+.submenu {
+    padding-left: 2.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+.submenu.open { max-height: 500px; } /* Yeterince büyük bir değer */
+.submenu a { font-size: 0.9rem; padding-top: 0.75rem; padding-bottom: 0.75rem; }
+.sidebar-footer { padding: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.btn { display: block; text-align: center; } /* Footer butonu için */
+
+/* ----- MAIN CONTENT (SAĞ İÇERİK) ----- */
+.main-header {
+    background-color: var(--card-bg);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 99;
+}
+.search-bar { flex-grow: 1; position: relative; }
+.search-bar i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+.search-bar input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 3rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--content-bg);
+}
+.header-right { display: flex; align-items: center; gap: 1rem; }
+.theme-toggle { background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-secondary); }
+.user-menu { display: flex; align-items: center; gap: 0.5rem; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; background-color: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; }
+
+.content-area { padding: 2rem; }
+.dashboard-section { display: none; }
+.dashboard-section.active { display: block; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ----- DASHBOARD KARTLARI VE GRAFİKLERİ ----- */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+.kpi-card { display: flex; align-items: center; gap: 1.5rem; background-color: var(--card-bg); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); }
+.kpi-card i { font-size: 2rem; padding: 1rem; border-radius: 50%; }
+.icon-teacher { background-color: rgba(37, 99, 235, 0.1); color: var(--primary-color); }
+.icon-parent { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+.icon-document { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.icon-event { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.kpi-info { display: flex; flex-direction: column; }
+.kpi-value { font-size: 2rem; font-weight: 700; color: var(--text-primary); }
+.kpi-label { font-size: 0.9rem; color: var(--text-secondary); }
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+.chart-container { background-color: var(--card-bg); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); }
+.placeholder-text { color: var(--text-secondary); text-align: center; padding: 3rem 0; }
+
+/* ----- MOBİL UYUMLULUK ----- */
+.menu-toggle-btn { display: none; background: none; border: none; font-size: 1.25rem; cursor: pointer; color: var(--text-secondary); }
+@media (max-width: 1024px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; width: 100%; }
+    .menu-toggle-btn { display: block; }
+}
+@media (max-width: 768px) {
+    .charts-grid { grid-template-columns: 1fr; }
+    .main-header { flex-wrap: wrap; }
+    .search-bar { width: 100%; order: 3; margin-top: 1rem; }
+}
+
+/* ----- GENEL KART STİLLERİ ----- */
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+}
+.section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }

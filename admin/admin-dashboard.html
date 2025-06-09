@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-DYS - Süper Admin Paneli</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/meb-logo.jpeg" alt="Logo" class="sidebar-logo">
+                <h2 class="sidebar-title">E-DYS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-chart-pie"></i><span>Genel Bakış</span></a></li>
+                    <li>
+                        <a href="#" class="nav-link has-submenu"><i class="fas fa-users-cog"></i><span>Kullanıcı Yönetimi</span></a>
+                        <ul class="submenu">
+                            <li><a href="#" class="nav-link" data-section="users-teacher">Öğretmenler</a></li>
+                            <li><a href="#" class="nav-link" data-section="users-parent">Veliler</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link has-submenu"><i class="fas fa-graduation-cap"></i><span>Akademik Yönetim</span></a>
+                        <ul class="submenu">
+                            <li><a href="#" class="nav-link" data-section="academic-classes">Sınıf ve Şubeler</a></li>
+                            <li><a href="#" class="nav-link" data-section="academic-schedule">Ders Programı</a></li>
+                            <li><a href="#" class="nav-link" data-section="academic-exams">Sınav Takvimi</a></li>
+                        </ul>
+                    </li>
+                     <li><a href="#" class="nav-link" data-section="communication"><i class="fas fa-bullhorn"></i><span>İletişim Yönetimi</span></a></li>
+                    <li><a href="#" class="nav-link" data-section="resources"><i class="fas fa-book"></i><span>Kaynak Kütüphanesi</span></a></li>
+                    <li><a href="#" class="nav-link" data-section="settings"><i class="fas fa-cog"></i><span>Sistem Ayarları</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Güvenli Çıkış</a>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <header class="main-header">
+                <button id="menu-toggle" class="menu-toggle-btn"><i class="fas fa-bars"></i></button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Panelde Ara...">
+                </div>
+                <div class="header-right">
+                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                    <div class="user-menu">
+                        <span class="user-name">Okul Müdürü</span>
+                        <div class="user-avatar"><i class="fas fa-user-tie"></i></div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="content-area">
+                <section id="dashboard" class="dashboard-section active">
+                    <h1 class="section-title">Genel Bakış ve Raporlar</h1>
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <i class="fas fa-chalkboard-teacher icon-teacher"></i>
+                            <div class="kpi-info">
+                                <span class="kpi-value">54</span>
+                                <span class="kpi-label">Toplam Öğretmen</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="fas fa-user-friends icon-parent"></i>
+                            <div class="kpi-info">
+                                <span class="kpi-value">450</span>
+                                <span class="kpi-label">Toplam Veli</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="fas fa-file-alt icon-document"></i>
+                            <div class="kpi-info">
+                                <span class="kpi-value">12</span>
+                                <span class="kpi-label">Onay Bekleyen Belge</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="fas fa-calendar-check icon-event"></i>
+                            <div class="kpi-info">
+                                <span class="kpi-value">3</span>
+                                <span class="kpi-label">Bu Haftaki Etkinlik</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Belge Onay Durumları</h3>
+                            <p class="placeholder-text">Burada belge durumlarını gösteren bir dairesel grafik (pasta chart) yer alacak.</p>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">Aylık Veli Toplantısı Katılımı</h3>
+                             <p class="placeholder-text">Burada katılım oranlarını gösteren bir çubuk grafik (bar chart) yer alacak.</p>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="users-teacher" class="dashboard-section">
+                    <h1 class="section-title">Öğretmen Yönetimi</h1>
+                    <div class="card">
+                        <p>Bu bölümde öğretmen hesapları oluşturulabilir, düzenlenebilir ve listelenebilir.</p>
+                    </div>
+                </section>
+
+                <section id="users-parent" class="dashboard-section">
+                     <h1 class="section-title">Veli Yönetimi</h1>
+                     <div class="card">
+                        <p>Bu bölümde veli hesapları yönetilebilir ve öğrencileri ile ilişkilendirilebilir.</p>
+                    </div>
+                </section>
+
+                <section id="communication" class="dashboard-section">
+                    <h1 class="section-title">İletişim Yönetimi</h1>
+                    <div class="card">
+                         <div class="card-header"><h2 class="card-title"><i class="fas fa-bullhorn"></i> Yeni Duyuru Gönder</h2></div>
+                         <form id="announcementForm">
+                            <p>Bu form aracılığıyla öğretmenlere ve velilere duyurular gönderebilirsiniz.</p>
+                         </form>
+                    </div>
+                </section>
+
+                 <section id="resources" class="dashboard-section">
+                     <h1 class="section-title">Kaynak Kütüphanesi</h1>
+                     <div class="card">
+                        <p>Bu bölüme yönetmelikler, formlar ve diğer önemli belgeler yüklenerek tüm öğretmenlerin erişimine sunulabilir.</p>
+                    </div>
+                </section>
+
+                <section id="settings" class="dashboard-section">
+                     <h1 class="section-title">Sistem Ayarları</h1>
+                     <div class="card">
+                        <p>Bu bölümde akademik yıl, okul bilgileri ve diğer genel sistem ayarları yönetilebilir.</p>
+                    </div>
+                </section>
+                
+                </main>
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+    <script src="admin-script.js"></script>
+</body>
+</html>
