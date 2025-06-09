@@ -47,7 +47,7 @@
             margin-bottom: 30px;
         }
 
-        /* --- YENİ EKLENEN SEKMELİ YAPI İÇİN STİLLER --- */
+        /* --- SEKMELİ YAPI İÇİN STİLLER --- */
         .tab-buttons {
             display: flex;
             margin-bottom: 20px;
@@ -55,7 +55,7 @@
         }
 
         .tab-button {
-            flex: 1; /* Butonların eşit genişlikte olmasını sağlar */
+            flex: 1;
             padding: 15px 10px;
             cursor: pointer;
             background: none;
@@ -63,7 +63,7 @@
             font-size: 16px;
             font-weight: bold;
             color: #888;
-            border-bottom: 3px solid transparent; /* Pasif sekme için şeffaf alt çizgi */
+            border-bottom: 3px solid transparent;
             transition: color 0.3s, border-color 0.3s;
         }
 
@@ -73,10 +73,9 @@
 
         .tab-button.active {
             color: #007bff;
-            border-bottom-color: #007bff; /* Aktif sekme için renkli alt çizgi */
+            border-bottom-color: #007bff;
         }
         
-        /* Sekme içeriğini gizlemek için */
         .tab-content {
             display: none;
         }
@@ -84,8 +83,6 @@
         .tab-content.active {
             display: block;
         }
-        /* --- STİL EKLEMELERİ SONU --- */
-
 
         /* Form Elemanları */
         .form-group {
@@ -117,8 +114,8 @@
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
         }
         
-        button {
-            width: 100%; /* Butonun tam genişlikte olması için */
+        button[type="submit"] {
+            width: 100%;
             padding: 12px;
             background-color: #007bff;
             color: white;
@@ -130,7 +127,7 @@
             transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
         }
 
-        button:hover {
+        button[type="submit"]:hover {
             background-color: #0056b3;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -144,8 +141,9 @@
         <p>Lütfen devam etmek için giriş yapın.</p>
         
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab('teacher')">Öğretmen Girişi</button>
-            <button class="tab-button" onclick="openTab('parent')">Veli Girişi</button>
+            <button class="tab-button active" onclick="openTab('teacher', this)">Öğretmen Girişi</button>
+            <button class="tab-button" onclick="openTab('parent', this)">Veli Girişi</button>
+            <button class="tab-button" onclick="window.location.href='admin-login.html'">İdareci Girişi</button>
         </div>
 
         <div id="teacher" class="tab-content active">
@@ -164,7 +162,8 @@
         </div>
 
         <div id="parent" class="tab-content">
-            <form action="parent/dasboard-parent.html"> <input type="hidden" name="role" value="parent">
+            <form action="parent/dasboard-parent.html">
+                <input type="hidden" name="role" value="parent">
                 <div class="form-group">
                     <label for="parent-username">Öğrenci T.C. Kimlik Numarası</label>
                     <input type="text" id="parent-username" name="username" required>
@@ -176,25 +175,24 @@
                 <button type="submit">Giriş Yap</button>
             </form>
         </div>
+        
         </div>
 
     <script>
-        function openTab(tabName) {
-            // Tüm sekmeleri ve içeriklerini al
+        function openTab(tabName, elmnt) {
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
             for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none"; // Hepsini gizle
+                tabcontent[i].style.display = "none";
             }
 
             tablinks = document.getElementsByClassName("tab-button");
             for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", ""); // Hepsinden active sınıfını kaldır
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
             }
 
-            // Sadece tıklanan sekmeyi ve içeriğini göster
             document.getElementById(tabName).style.display = "block";
-            event.currentTarget.className += " active";
+            elmnt.className += " active";
         }
     </script>
 
