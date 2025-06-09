@@ -172,3 +172,114 @@ body {
     border: 1px solid var(--border-color);
 }
 .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }
+
+/* admin-style.css dosyasının sonuna eklenecekler */
+
+/* ----- BÖLÜM BAŞLIĞI VE AKSİYON BUTONLARI ----- */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.section-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* ----- MODAL STİLLERİ ----- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.modal-title {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.modal-description {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.import-file-dropzone {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background-color: var(--content-bg);
+    position: relative;
+    transition: all 0.2s ease;
+}
+.import-file-dropzone.is-dragging {
+    border-color: var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+}
+.import-file-dropzone.has-file {
+    border-color: var(--success-color);
+    background-color: rgba(16, 185, 129, 0.05);
+}
+.dropzone-content i { font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem; }
+.dropzone-content span { display: block; font-weight: 500; }
+.dropzone-content small { color: var(--text-secondary); }
+
+.template-download {
+    text-align: center;
+    margin: 1rem 0;
+}
+.template-download a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+#processImportBtn { width: 100%; margin-top: 1rem; }
+.import-result { text-align: center; padding: 2rem 0; }
+.import-result i { font-size: 4rem; color: var(--success-color); }
+.import-result h3 { margin: 1rem 0 0.5rem 0; }

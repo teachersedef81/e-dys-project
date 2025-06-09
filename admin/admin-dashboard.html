@@ -59,93 +59,173 @@
             </header>
 
             <main class="content-area">
-                <section id="dashboard" class="dashboard-section active">
-                    <h1 class="section-title">Genel Bakış ve Raporlar</h1>
-                    <div class="kpi-grid">
-                        <div class="kpi-card">
-                            <i class="fas fa-chalkboard-teacher icon-teacher"></i>
-                            <div class="kpi-info">
-                                <span class="kpi-value">54</span>
-                                <span class="kpi-label">Toplam Öğretmen</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <i class="fas fa-user-friends icon-parent"></i>
-                            <div class="kpi-info">
-                                <span class="kpi-value">450</span>
-                                <span class="kpi-label">Toplam Veli</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <i class="fas fa-file-alt icon-document"></i>
-                            <div class="kpi-info">
-                                <span class="kpi-value">12</span>
-                                <span class="kpi-label">Onay Bekleyen Belge</span>
-                            </div>
-                        </div>
-                        <div class="kpi-card">
-                            <i class="fas fa-calendar-check icon-event"></i>
-                            <div class="kpi-info">
-                                <span class="kpi-value">3</span>
-                                <span class="kpi-label">Bu Haftaki Etkinlik</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="charts-grid">
-                        <div class="chart-container">
-                            <h3 class="chart-title">Belge Onay Durumları</h3>
-                            <p class="placeholder-text">Burada belge durumlarını gösteren bir dairesel grafik (pasta chart) yer alacak.</p>
-                        </div>
-                        <div class="chart-container">
-                            <h3 class="chart-title">Aylık Veli Toplantısı Katılımı</h3>
-                             <p class="placeholder-text">Burada katılım oranlarını gösteren bir çubuk grafik (bar chart) yer alacak.</p>
-                        </div>
-                    </div>
-                </section>
-                
-                <section id="users-teacher" class="dashboard-section">
-                    <h1 class="section-title">Öğretmen Yönetimi</h1>
-                    <div class="card">
-                        <p>Bu bölümde öğretmen hesapları oluşturulabilir, düzenlenebilir ve listelenebilir.</p>
-                    </div>
-                </section>
+    <section id="dashboard" class="dashboard-section active">
+        <h1 class="section-title">Genel Bakış ve Raporlar</h1>
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <i class="fas fa-chalkboard-teacher icon-teacher"></i>
+                <div class="kpi-info">
+                    <span class="kpi-value">54</span>
+                    <span class="kpi-label">Toplam Öğretmen</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-user-friends icon-parent"></i>
+                <div class="kpi-info">
+                    <span class="kpi-value">450</span>
+                    <span class="kpi-label">Toplam Veli</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-file-alt icon-document"></i>
+                <div class="kpi-info">
+                    <span class="kpi-value">12</span>
+                    <span class="kpi-label">Onay Bekleyen Belge</span>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <i class="fas fa-calendar-check icon-event"></i>
+                <div class="kpi-info">
+                    <span class="kpi-value">3</span>
+                    <span class="kpi-label">Bu Haftaki Etkinlik</span>
+                </div>
+            </div>
+        </div>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Belge Onay Durumları</h3>
+                <p class="placeholder-text">Burada belge durumlarını gösteren bir dairesel grafik (pasta chart) yer alacak.</p>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Aylık Veli Toplantısı Katılımı</h3>
+                 <p class="placeholder-text">Burada katılım oranlarını gösteren bir çubuk grafik (bar chart) yer alacak.</p>
+            </div>
+        </div>
+    </section>
 
-                <section id="users-parent" class="dashboard-section">
-                     <h1 class="section-title">Veli Yönetimi</h1>
-                     <div class="card">
-                        <p>Bu bölümde veli hesapları yönetilebilir ve öğrencileri ile ilişkilendirilebilir.</p>
-                    </div>
-                </section>
+    <section id="users-teacher" class="dashboard-section">
+        <div class="section-header">
+            <h1 class="section-title">Öğretmen Yönetimi</h1>
+            <div class="section-actions">
+                <button class="btn btn-secondary"><i class="fas fa-plus"></i> Yeni Öğretmen Ekle</button>
+                <button class="btn btn-primary open-import-modal-btn" data-import-type="teachers"><i class="fas fa-file-import"></i> Excel'den Aktar</button>
+            </div>
+        </div>
+        <div class="card">
+            <p>Bu bölümde öğretmen hesapları oluşturulabilir, düzenlenebilir ve listelenebilir.</p>
+        </div>
+    </section>
 
-                <section id="communication" class="dashboard-section">
-                    <h1 class="section-title">İletişim Yönetimi</h1>
-                    <div class="card">
-                         <div class="card-header"><h2 class="card-title"><i class="fas fa-bullhorn"></i> Yeni Duyuru Gönder</h2></div>
-                         <form id="announcementForm">
-                            <p>Bu form aracılığıyla öğretmenlere ve velilere duyurular gönderebilirsiniz.</p>
-                         </form>
-                    </div>
-                </section>
+    <section id="users-parent" class="dashboard-section">
+        <div class="section-header">
+            <h1 class="section-title">Veli Yönetimi</h1>
+            <div class="section-actions">
+                 <button class="btn btn-secondary"><i class="fas fa-plus"></i> Yeni Veli Ekle</button>
+                 <button class="btn btn-primary open-import-modal-btn" data-import-type="parents"><i class="fas fa-file-import"></i> Excel'den Aktar</button>
+            </div>
+        </div>
+        <div class="card">
+            <p>Bu bölümde veli hesapları yönetilebilir ve öğrencileri ile ilişkilendirilebilir.</p>
+        </div>
+    </section>
+    
+    <section id="academic-classes" class="dashboard-section">
+       <div class="section-header">
+            <h1 class="section-title">Sınıf ve Şube Yönetimi</h1>
+            <div class="section-actions">
+                <button class="btn btn-secondary"><i class="fas fa-plus"></i> Yeni Şube Ekle</button>
+                <button class="btn btn-primary open-import-modal-btn" data-import-type="classes"><i class="fas fa-file-import"></i> Toplu Şube Aktar</button>
+            </div>
+      </div>
+       <div class="card">
+            <p>Bu bölümde sınıflar ve şubeler oluşturulabilir, şubelere öğretmen atanabilir.</p>
+        </div>
+    </section>
+    
+    <section id="academic-schedule" class="dashboard-section">
+        <div class="section-header">
+            <h1 class="section-title">Haftalık Ders Programı Yönetimi</h1>
+            <div class="section-actions">
+                <button class="btn btn-primary open-import-modal-btn" data-import-type="schedule"><i class="fas fa-file-import"></i> Ders Programını Aktar</button>
+            </div>
+        </div>
+         <div class="card">
+            <p>Bu bölümde okulun haftalık ders programı yüklenebilir ve yönetilebilir.</p>
+        </div>
+    </section>
+    
+    <section id="academic-exams" class="dashboard-section">
+        <div class="section-header">
+            <h1 class="section-title">Sınav Takvimi Yönetimi</h1>
+            <div class="section-actions">
+                 <button class="btn btn-secondary"><i class="fas fa-plus"></i> Yeni Sınav Ekle</button>
+                <button class="btn btn-primary open-import-modal-btn" data-import-type="exams"><i class="fas fa-file-import"></i> Sınav Takvimini Aktar</button>
+            </div>
+        </div>
+        <div class="card">
+            <p>Bu bölümde ortak sınavlar için takvim oluşturulabilir ve yayınlanabilir.</p>
+        </div>
+    </section>
 
-                 <section id="resources" class="dashboard-section">
-                     <h1 class="section-title">Kaynak Kütüphanesi</h1>
-                     <div class="card">
-                        <p>Bu bölüme yönetmelikler, formlar ve diğer önemli belgeler yüklenerek tüm öğretmenlerin erişimine sunulabilir.</p>
-                    </div>
-                </section>
+    <section id="communication" class="dashboard-section">
+        <h1 class="section-title">İletişim Yönetimi</h1>
+        <div class="card">
+             <div class="card-header"><h2 class="card-title"><i class="fas fa-bullhorn"></i> Yeni Duyuru Gönder</h2></div>
+             <form id="announcementForm">
+                <p>Bu form aracılığıyla öğretmenlere ve velilere duyurular gönderebilirsiniz.</p>
+             </form>
+        </div>
+    </section>
 
-                <section id="settings" class="dashboard-section">
-                     <h1 class="section-title">Sistem Ayarları</h1>
-                     <div class="card">
-                        <p>Bu bölümde akademik yıl, okul bilgileri ve diğer genel sistem ayarları yönetilebilir.</p>
-                    </div>
-                </section>
-                
-                </main>
+    <section id="resources" class="dashboard-section">
+         <h1 class="section-title">Kaynak Kütüphanesi</h1>
+         <div class="card">
+            <p>Bu bölüme yönetmelikler, formlar ve diğer önemli belgeler yüklenerek tüm öğretmenlerin erişimine sunulabilir.</p>
+        </div>
+    </section>
+
+    <section id="settings" class="dashboard-section">
+         <h1 class="section-title">Sistem Ayarları</h1>
+         <div class="card">
+            <p>Bu bölümde akademik yıl, okul bilgileri ve diğer genel sistem ayarları yönetilebilir.</p>
+        </div>
+    </section>
+</main>
         </div>
     </div>
 
     <div id="notificationContainer"></div>
     <script src="admin-script.js"></script>
+    <div class="modal-overlay" id="importModal" style="display: none;">
+    <div class="modal-content">
+        <button class="modal-close" id="closeImportModalBtn"><i class="fas fa-times"></i></button>
+        <h2 class="modal-title">Toplu Kullanıcı Aktarma</h2>
+        
+        <div id="import-step-1">
+            <p class="modal-description">
+                E-Okul'dan indirdiğiniz öğretmen listesini (.xlsx veya .csv) aşağıdaki alana sürükleyin veya dosyayı seçin.
+            </p>
+            <div class="import-file-dropzone" id="importDropzone">
+                <input type="file" id="importFileInput" accept=".xlsx, .csv" class="file-upload-input">
+                <div class="dropzone-content">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span id="importFileText">Dosyayı buraya sürükleyin</span>
+                    <small>veya seçmek için tıklayın</small>
+                </div>
+            </div>
+            <div class="template-download">
+                <a href="#" download><i class="fas fa-file-excel"></i> Doğru format için şablon dosyasını indirin.</a>
+            </div>
+            <button class="btn btn-primary" id="processImportBtn" disabled>Aktarımı Başlat</button>
+        </div>
+
+        <div id="import-step-2" style="display: none;">
+            <div class="import-result">
+                </div>
+            <button class="btn btn-secondary" id="closeImportModalAfterSuccessBtn">Kapat</button>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
