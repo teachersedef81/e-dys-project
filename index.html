@@ -5,133 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-DYS - Giriş Yap</title>
     <style>
-        /* Genel Sayfa Stilleri */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #005a9c 0%, #003a6c 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-
-        /* Giriş Konteyneri */
-        .login-container {
-            background-color: white;
-            padding: 40px 50px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 420px;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        .login-container:hover {
-            transform: scale(1.02);
-        }
-
-        .login-logo {
-            width: 100px;
-            height: auto;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        /* --- SEKMELİ YAPI İÇİN STİLLER --- */
-        .tab-buttons {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 15px 10px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            font-size: 16px;
-            font-weight: bold;
-            color: #888;
-            border-bottom: 3px solid transparent;
-            transition: color 0.3s, border-color 0.3s;
-        }
-
-        .tab-button:hover {
-            color: #333;
-        }
-
-        .tab-button.active {
-            color: #007bff;
-            border-bottom-color: #007bff;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Form Elemanları */
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: #555;
-        }
-
-        input[type="text"],
-        input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-        }
-        
-        button[type="submit"] {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-        }
-
-        button[type="submit"]:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
+        /* CSS stilleriniz burada... (Değişiklik yok, aynı kalabilir) */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: linear-gradient(135deg, #005a9c 0%, #003a6c 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .login-container { background-color: white; padding: 40px 50px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); width: 100%; max-width: 420px; text-align: center; }
+        .login-logo { width: 100px; height: auto; margin-bottom: 20px; }
+        h1 { color: #333; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 30px; }
+        .tab-buttons { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .tab-button { flex: 1; padding: 15px 10px; cursor: pointer; background: none; border: none; font-size: 16px; font-weight: bold; color: #888; border-bottom: 3px solid transparent; transition: color 0.3s, border-color 0.3s; }
+        .tab-button:hover { color: #333; }
+        .tab-button.active { color: #007bff; border-bottom-color: #007bff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; color: #555; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button[type="submit"] { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .error-message { color: #ef4444; font-size: 0.875rem; margin-top: 5px; height: 15px; text-align: left; }
+        input.invalid-input { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important; }
     </style>
 </head>
 <body>
@@ -147,8 +38,7 @@
         </div>
 
         <div id="teacher" class="tab-content active">
-            <form action="dashboard.html">
-                 <input type="hidden" name="role" value="teacher">
+            <form id="teacher-form">
                 <div class="form-group">
                     <label for="teacher-username">Kullanıcı Adı (MEBBİS)</label>
                     <input type="text" id="teacher-username" name="username" required>
@@ -157,44 +47,81 @@
                     <label for="teacher-password">Şifre</label>
                     <input type="password" id="teacher-password" name="password" required>
                 </div>
+                <div class="error-message" id="teacher-error"></div>
                 <button type="submit">Giriş Yap</button>
             </form>
         </div>
 
         <div id="parent" class="tab-content">
-            <form action="parent/dasboard-parent.html">
-                <input type="hidden" name="role" value="parent">
+            <form id="parent-form" action="parent/dasboard-parent.html">
                 <div class="form-group">
                     <label for="parent-username">Öğrenci T.C. Kimlik Numarası</label>
-                    <input type="text" id="parent-username" name="username" required>
+                    <input type="text" id="parent-username" name="username" required maxlength="11" placeholder="11 haneli T.C. numarasını girin">
+                    <div class="error-message" id="tc-error"></div>
                 </div>
                 <div class="form-group">
                     <label for="parent-password">Öğrenci Okul Numarası</label>
-                    <input type="password" id="parent-password" name="password" required>
+                    <input type="text" id="parent-password" name="password" required>
                 </div>
                 <button type="submit">Giriş Yap</button>
             </form>
         </div>
-        
-        </div>
+    </div>
 
     <script>
         function openTab(tabName, elmnt) {
+            // ... openTab fonksiyonu aynı kalabilir ...
             var i, tabcontent, tablinks;
             tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-
+            for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
             tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-
+            for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
             document.getElementById(tabName).style.display = "block";
             elmnt.className += " active";
         }
-    </script>
 
+        // --- ÖĞRETMEN GİRİŞİ DOĞRULAMA SİMÜLASYONU ---
+        const teacherForm = document.getElementById('teacher-form');
+        teacherForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Formun otomatik gönderimini engelle
+
+            const usernameInput = document.getElementById('teacher-username');
+            const passwordInput = document.getElementById('teacher-password');
+            const errorDiv = document.getElementById('teacher-error');
+            
+            // Prototip için doğru kullanıcı adı ve şifreyi burada belirliyoruz.
+            const correctUsername = 'ogretmen';
+            const correctPassword = '123';
+
+            if (usernameInput.value === correctUsername && passwordInput.value === correctPassword) {
+                // Bilgiler doğruysa, dashboard'a yönlendir.
+                window.location.href = 'dashboard.html';
+            } else {
+                // Bilgiler yanlışsa, hata mesajı göster.
+                errorDiv.textContent = 'Kullanıcı adı veya şifre hatalı.';
+                usernameInput.classList.add('invalid-input');
+                passwordInput.classList.add('invalid-input');
+            }
+        });
+
+        // --- VELİ GİRİŞİ DOĞRULAMASI ---
+        // Bu kod önceki adımdan, aynı şekilde çalışmaya devam eder.
+        const parentForm = document.getElementById('parent-form');
+        const tcInput = document.getElementById('parent-username');
+        const tcErrorDiv = document.getElementById('tc-error');
+        parentForm.addEventListener('submit', function(event) {
+            tcErrorDiv.textContent = '';
+            tcInput.classList.remove('invalid-input');
+            if (!/^\d{11}$/.test(tcInput.value) || tcInput.value.startsWith('0')) {
+                event.preventDefault();
+                tcErrorDiv.textContent = 'Lütfen geçerli bir T.C. Kimlik Numarası girin.';
+                tcInput.classList.add('invalid-input');
+            }
+        });
+        tcInput.addEventListener('input', () => {
+             tcErrorDiv.textContent = '';
+             tcInput.classList.remove('invalid-input');
+        });
+    </script>
 </body>
 </html>

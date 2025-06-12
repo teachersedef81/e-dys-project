@@ -946,3 +946,17 @@ main.dashboard-container {
     border-color: var(--primary-color);
 }
 
+/* Bu stilleri <style> etiketinin içine ekleyin */
+
+.error-message {
+    color: #ef4444; /* Kırmızı renk */
+    font-size: 0.875rem; /* 14px */
+    margin-top: 5px;
+    height: 15px; /* Boşken yer kaplamaması ve doluyken kaydırma yapmaması için */
+    text-align: left;
+}
+
+input.invalid-input {
+    border-color: #ef4444 !important; /* Hatalı input çerçevesi */
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25) !important; /* Hatalı input parlaması */
+}
