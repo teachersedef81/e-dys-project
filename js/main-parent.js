@@ -1,3 +1,39 @@
+/**
+ * main-parent.js
+ */
+import { initAuthGuard } from '../js/auth.js';
+import { initThemeToggle } from '../js/ui.js';
+import { renderNavbar } from '../js/components/Navbar.js';
+import { renderFooter } from '../js/components/Footer.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Auth
+    initAuthGuard('parent');
+
+    // UI Components
+    renderNavbar('navbar-root', {
+        logoPath: '../edusync-logo.png',
+        title: 'EduSync Veli',
+        roleBadgeIcon: 'fa-user-friends',
+        roleBadgeText: 'Veli Portalı',
+        roleBadgeId: 'headerParentName',
+        logoutPath: 'index.html',
+        navbarClass: 'parent-navbar',
+        brandClass: 'brand',
+        actionsClass: 'flex items-center space-x-6',
+        themeToggleStyle: 'color: var(--primary-color); background: rgba(79, 70, 229, 0.1); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 50%;',
+        customLinks: `<a href="billboard.html" class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium px-3 py-2 rounded-lg transition-colors text-sm" title="Canlı Ders Panosu"><i class="fas fa-tv mr-2"></i> Canlı Pano</a>`
+    });
+    renderFooter('footer-root', '../');
+
+    // Theme logic handled by UI
+    initThemeToggle();
+
+    // Setup tabs and logic from old parent/script.js ...
+});
+
+
+/* --- ORIGINAL LOGIC RESTORED --- */
 // ---- Inactivity Timeout ----
 let inactivityTimer;
 const TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes

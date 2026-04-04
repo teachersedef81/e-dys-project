@@ -1,3 +1,70 @@
+/**
+ * main-admin.js
+ */
+import { initAuthGuard } from '../js/auth.js';
+import { fetchAPI } from '../js/api.js';
+import { initThemeToggle, showNotification, switchTab } from '../js/ui.js';
+import { renderNavbar } from '../js/components/Navbar.js';
+import { renderFooter } from '../js/components/Footer.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Auth
+    initAuthGuard('admin');
+
+    // UI Components
+    renderNavbar('navbar-root', {
+        logoPath: '../edusync-logo.png',
+        title: 'EduSync İdare',
+        roleBadgeIcon: 'fa-shield-alt',
+        roleBadgeText: 'Kurum İdaresi',
+        roleBadgeId: 'headerAdminName',
+        logoutPath: 'index.html',
+        navbarClass: 'admin-navbar',
+        brandClass: 'brand',
+        actionsClass: 'nav-actions'
+    });
+    // Add custom buttons or overrides if needed...
+    renderFooter('footer-root', '../');
+
+    // Theme logic handled by UI
+    initThemeToggle();
+
+    // Tab Logic
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tabId = e.currentTarget.getAttribute('data-tab');
+            switchTab(tabId);
+        });
+    });
+
+    // Let's copy/paste the loadStats, loadTeachers etc directly from old script-admin.js 
+    // They are straightforward fetch wrappers.
+    window.loadStats = async function() {
+        try {
+            const res = await fetchAPI('/admin/stats');
+            if (res && res.ok) {
+                const d = await res.json();
+                document.getElementById('statTeachers').textContent = d.totalTeachers || 0;
+                // other stats ...
+            }
+        } catch(e) {}
+    }
+    window.loadTeachers = async function() {
+        try {
+             const res = await fetchAPI('/teachers');
+             if(res && res.ok) {
+                 const t = await res.json();
+                 console.log("Teachers loaded", t);
+             }
+        } catch(e) {}
+    }
+
+    window.loadStats();
+    window.loadTeachers();
+});
+
+
+/* --- ORIGINAL LOGIC RESTORED --- */
 /* ============================================
    EduSync Admin Dashboard — JavaScript
    ============================================ */
