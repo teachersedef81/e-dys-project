@@ -1,0 +1,373 @@
+const express = require('express');
+const cors = require('cors');
+const db = require('./db'); // Database layer
+const integrations = require('./integrations'); // Integration layer
+const { GoogleGenAI } = require('@google/genai');
+require('dotenv').config();
+const bcrypt = require('bcrypt');
+
+const app = express();
+const port = 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname));
+
+const JWT_SECRET = process.env.JWT_SECRET || 'edusync-super-secret-key';
+const jwt = require('jsonwebtoken');
+
+// --- SECURITY MIDDLEWARE: Authorization Check ---
+const checkAuth = (req, res, next) => {
+    // Check header (API) or cookie (Page Load)
+    let token = null;
+    if (req.headers['authorization']) {
+        token = req.headers['authorization'].split(' ')[1];
+    } else if (req.headers.cookie) {
+        const cookies = req.headers.cookie.split(';').reduce((acc, c) => {
+            const [k, v] = c.trim().split('=');
+            acc[k] = v;
+            return acc;
+        }, {});
+        token = cookies['edusync_token'];
+    }
+
+    if (!token) {
+        if (req.path.endsWith('.html')) return res.redirect('/index.html');
+        return res.status(401).json({ error: "Yetkisiz erişim. Lütfen giriş yapın." });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        if (req.path.endsWith('.html')) return res.redirect('/index.html');
+        return res.status(401).json({ error: "Geçersiz veya süresi dolmuş oturum." });
+    }
+};
+
+// Protect matching dashboard pages
+app.use(['/dashboard.html', '/admin/dashboard-admin.html', '/parent/dasboard-parent.html'], checkAuth);
+
+// --- SECURITY MIDDLEWARE: SSL Enforcement ---
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV === 'production' && !req.secure && req.get('x-forwarded-proto') !== 'https') {
+        return res.redirect('https://' + req.get('host') + req.url);
+    }
+    next();
+});
+
+// Initialize Database
+(async () => {
+    try {
+        await db.connect();
+        await db.init();
+        
+        // Initialize default mock users if needed
+        const row = await db.get("SELECT count(*) as count FROM users");
+        if (row && row.count === 0) {
+            const adminHash = bcrypt.hashSync("123456", 10);
+            const teacherHash = bcrypt.hashSync("123456", 10);
+            const parentHash = bcrypt.hashSync("123456", 10);
+            await db.run("INSERT INTO users (role, username, password_hash) VALUES (?, ?, ?)", ["admin", "admin", adminHash]);
+            await db.run("INSERT INTO users (role, username, password_hash) VALUES (?, ?, ?)", ["teacher", "teacher1", teacherHash]);
+            await db.run("INSERT INTO users (role, username, password_hash) VALUES (?, ?, ?)", ["parent", "12345678900", parentHash]);
+            console.log('Mock users created.');
+        }
+    } catch (err) {
+        console.error('Database initialization failed:', err);
+    }
+})();
+
+// AI Configuration
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// --- API Endpoints ---
+
+// 1. Get all documents
+app.get('/api/documents', async (req, res) => {
+    try {
+        const rows = await db.query("SELECT * FROM documents ORDER BY id DESC");
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 2. Add a new document
+app.post('/api/documents', async (req, res) => {
+    const { category, type, name, recipients, date, status, content } = req.body;
+    try {
+        const result = await db.run(
+            `INSERT INTO documents (category, type, name, recipients, date, status, content) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [category, type, name, recipients, date, status || 'Bekliyor', content || '']
+        );
+        res.json({ id: result.id, category, type, name, recipients, date, status: status || 'Bekliyor' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 3. Update document status
+app.put('/api/documents/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const result = await db.run(
+            `UPDATE documents SET status = ? WHERE id = ?`,
+            [status, req.params.id]
+        );
+        res.json({ message: "Status updated", changes: result.changes });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 4. Generate AI Minute (Tutanak Oluştur)
+app.post('/api/generate-minutes', async (req, res) => {
+    try {
+        const { prompt, context } = req.body;
+        if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
+
+        const province = context?.province || "[İl Belirtilmedi]";
+        const district = context?.district || "[İlçe Belirtilmedi]";
+        const school = context?.school || "[Okul Adı Belirtilmedi]";
+        const year = context?.year || "[Eğitim Öğretim Yılı Belirtilmedi]";
+
+        const systemInstruction = `Sen uzman bir Milli Eğitim Bakanlığı (MEB) idarecisi ve öğretmenisin. 
+Sana verilen notları kullanarak, "RESMİ YAZIŞMA USUL VE ESASLARI HAKKINDA YÖNETMELİK" (MEB Güncel Mevzuatı) hükümlerine tam uygun bir "Toplantı Tutanağı" taslağı oluşturacaksın.
+
+Resmi Yazışma Kuralları:
+1. Başlık: T.C. [İL] VALİLİĞİ / [İLÇE] KAYMAKAMLIĞI ve ardından [OKUL ADI] şeklinde hiyerarşik yapı.
+2. Sayı ve Konu: Sol üstte "Sayı:" ve "Konu:" bölümleri.
+3. Tarih: Sağ üstte standart formatta.
+4. Hitap: Metin "GEREĞİ DÜŞÜNÜLDÜ:" veya gündem maddeleri ile başlamalı.
+5. Dil: Resmi, ciddi, 3. tekil şahıs veya edilgen yapı.
+6. İmza Bloğu: Ad-Soyad ve Unvan (Okul Müdürü, Müdür Yardımcısı, Branş Öğretmeni vb.) için yer bırakılmalı.
+
+Kurum Bilgileri:
+İl: ${province}
+İlçe: ${district}
+Okul Adı: ${school}
+Eğitim Öğretim Yılı: ${year}
+
+Çıktı Kuralı: Markdown kullanma. Sadece düz metin. Resmi yazışma şablonuna sadık kal.`;
+
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                systemInstruction: systemInstruction,
+            }
+        });
+
+        const watermark = "\n\n--------------------------------------------------\n[BU BELGE YAPAY ZEKA TARAFINDAN TASLAK OLARAK OLUŞTURULMUŞTUR, ISLAK İMZA ÖNCESİ İDARİ KONTROL ZORUNLUDUR]";
+        res.json({ result: response.text + watermark });
+    } catch (error) {
+        console.error('AI Generation Error:', error);
+        res.status(500).json({ error: 'Tutanak oluşturulurken bir hata oluştu.' });
+    }
+});
+
+app.get('/api/parent-info', async (req, res) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        let userClass = null;
+        if (authHeader) {
+            try {
+                const token = authHeader.split(' ')[1];
+                const decoded = jwt.verify(token, JWT_SECRET);
+                userClass = decoded.student_class;
+            } catch (e) {}
+        }
+
+        const todayStr = new Date().toLocaleDateString('tr-TR');
+        let sql = "SELECT * FROM parent_info WHERE (target_class IS NULL OR target_class = '' OR target_class = ?)";
+        const rows = await db.query(sql + " ORDER BY id DESC", [userClass || '']);
+        
+        // Granular filter: Duty (nobet) only for today
+        const filtered = rows.filter(r => r.type !== 'nobet' || r.date === todayStr);
+        res.json(filtered);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/parent-info', async (req, res) => {
+    try {
+        const { type, title, content, date, target_class } = req.body;
+        const result = await db.run("INSERT INTO parent_info (type, title, content, date, target_class) VALUES (?, ?, ?, ?, ?)", 
+            [type, title, content, date, target_class || '']);
+        res.json({ success: true, id: result.id });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 6. Login API with bcrypt
+app.post('/api/login', async (req, res) => {
+    try {
+        const { username, password, role } = req.body;
+        const user = await db.get("SELECT * FROM users WHERE username = ? AND role = ?", [username, role]);
+        
+        if (!user) return res.status(401).json({ error: "Kullanıcı bulunamadı" });
+
+        const match = bcrypt.compareSync(password, user.password_hash);
+        if (!match) return res.status(401).json({ error: "Hatalı şifre" });
+
+        const token = jwt.sign(
+            { id: user.id, username: user.username, role: user.role, student_class: user.student_class },
+            JWT_SECRET,
+            { expiresIn: '2h' }
+        );
+
+        // Set cookie for page-level checkAuth
+        res.cookie('edusync_token', token, { httpOnly: false, secure: process.env.NODE_ENV === 'production', maxAge: 2 * 60 * 60 * 1000 });
+        
+        res.json({ success: true, token, role: user.role });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 7. Attendance API
+app.get('/api/attendance', async (req, res) => {
+    try {
+        const date = req.query.date || new Date().toLocaleDateString('tr-TR');
+        const rows = await db.query("SELECT * FROM attendance WHERE date = ?", [date]);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/attendance', async (req, res) => {
+    try {
+        const { date, student_id, student_name, status } = req.body;
+        const row = await db.get("SELECT id FROM attendance WHERE date = ? AND student_id = ?", [date, student_id]);
+        
+        if (row) {
+            const result = await db.run("UPDATE attendance SET status = ? WHERE id = ?", [status, row.id]);
+            res.json({ success: true, id: row.id });
+        } else {
+            const result = await db.run("INSERT INTO attendance (date, student_id, student_name, status) VALUES (?, ?, ?, ?)",
+                [date, student_id, student_name, status]);
+            res.json({ success: true, id: result.id });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 8. Stats API
+app.get('/api/stats', async (req, res) => {
+    try {
+        const total = await db.get("SELECT count(*) as total FROM documents");
+        const pending = await db.get("SELECT count(*) as pending FROM documents WHERE status = 'Bekliyor'");
+        const approved = await db.get("SELECT count(*) as approved FROM documents WHERE status = 'Onaylandı'");
+        
+        res.json({
+            totalDocuments: total ? total.total : 0,
+            pendingDocuments: pending ? pending.pending : 0,
+            approvedDocuments: approved ? approved.approved : 0
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 9. Admin Stats API (connected directly to DB layer)
+app.get('/api/admin/stats', checkAuth, async (req, res) => {
+    try {
+        const stats = await db.getCounts();
+        res.json(stats);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 10. Teachers API
+app.get('/api/teachers', async (req, res) => {
+    try {
+        const rows = await db.query("SELECT * FROM teachers ORDER BY id DESC");
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Single teacher create
+app.post('/api/teachers', async (req, res) => {
+    try {
+        const teacher = integrations.transformTeacher(req.body);
+        const validation = integrations.validateTeacher(teacher);
+        if (!validation.isValid) return res.status(400).json({ error: validation.error });
+
+        // Simple duplicate check (by name and branch)
+        const existing = await db.get("SELECT id FROM teachers WHERE name = ? AND branch = ?", [teacher.name, teacher.branch]);
+        if (existing) return res.status(409).json({ error: "Bu öğretmen zaten kayıtlı." });
+
+        const result = await db.run("INSERT INTO teachers (name, branch, phone, email) VALUES (?, ?, ?, ?)",
+            [teacher.name, teacher.branch, teacher.phone || '', teacher.email || '']);
+        res.json({ success: true, id: result.id, ...teacher });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Batch import with de-duplication
+app.post('/api/teachers/batch', async (req, res) => {
+    const teachers = req.body; // Array of teacher objects
+    if (!Array.isArray(teachers)) return res.status(400).json({ error: "Veri dizi formatında olmalı." });
+
+    let added = 0;
+    let skipped = 0;
+    let errors = 0;
+
+    for (let raw of teachers) {
+        try {
+            const t = integrations.transformTeacher(raw);
+            const validation = integrations.validateTeacher(t);
+            if (!validation.isValid) { skipped++; continue; }
+
+            // Deduplication logic: Check name + branch
+            const existing = await db.get("SELECT id FROM teachers WHERE name = ? AND branch = ?", [t.name, t.branch]);
+            if (existing) {
+                skipped++;
+                continue;
+            }
+
+            await db.run("INSERT INTO teachers (name, branch, phone, email) VALUES (?, ?, ?, ?)",
+                [t.name, t.branch, t.phone || '', t.email || '']);
+            added++;
+        } catch (err) {
+            console.error('Batch item error:', err);
+            errors++;
+        }
+    }
+
+    res.json({ success: true, added, skipped, errors });
+});
+
+app.delete('/api/teachers/:id', async (req, res) => {
+    try {
+        const result = await db.run("DELETE FROM teachers WHERE id = ?", [req.params.id]);
+        res.json({ success: true, changes: result.changes });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 11. Delete Announcement
+app.delete('/api/parent-info/:id', async (req, res) => {
+    try {
+        const result = await db.run("DELETE FROM parent_info WHERE id = ?", [req.params.id]);
+        res.json({ success: true, changes: result.changes });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Start Server
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});

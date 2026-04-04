@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSync — Canlı Ders Panosu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ========= BILLBOARD GLOBAL ========= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0a0e1a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ========= HEADER BAR ========= */
+        .bb-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+            border-bottom: 3px solid #6366f1;
+            position: relative;
+            z-index: 10;
+        }
+
+        .bb-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .bb-logo img {
+            height: 44px;
+            border-radius: 8px;
+        }
+
+        .bb-logo h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .bb-logo h1 span {
+            color: #fbbf24;
+        }
+
+        .bb-clock-area {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .bb-date {
+            font-size: 1rem;
+            color: #c7d2fe;
+            font-weight: 400;
+        }
+
+        .bb-clock {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .bb-clock .blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .bb-period-badge {
+            background: #22c55e;
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .bb-period-badge.teneffus {
+            background: #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .bb-period-badge.bitti {
+            background: #64748b;
+            box-shadow: none;
+        }
+
+        .bb-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .bb-actions button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #c7d2fe;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .bb-actions button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        /* ========= LESSON PERIOD TABS ========= */
+        .bb-period-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.75rem 2.5rem;
+            background: #111827;
+            border-bottom: 1px solid #1e293b;
+            overflow-x: auto;
+        }
+
+        .bb-period-tab {
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #64748b;
+            white-space: nowrap;
+            transition: all 0.25s;
+            border: 1px solid transparent;
+        }
+
+        .bb-period-tab.active {
+            background: #4f46e5;
+            color: #fff;
+            border-color: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .bb-period-tab.completed {
+            color: #475569;
+            text-decoration: line-through;
+        }
+
+        /* ========= TABLE ========= */
+        .bb-table-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bb-table-scroll {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        table.bb-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bb-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .bb-table thead th {
+            background: #1e293b;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.85rem 1.5rem;
+            text-align: left;
+            border-bottom: 2px solid #334155;
+        }
+
+        .bb-table tbody tr {
+            border-bottom: 1px solid #1e293b;
+            transition: background 0.3s;
+        }
+
+        .bb-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .bb-table tbody tr:hover {
+            background: rgba(99, 102, 241, 0.08);
+        }
+
+        .bb-table tbody tr.highlight-row {
+            background: rgba(99, 102, 241, 0.12);
+            animation: rowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes rowPulse {
+
+            0%,
+            100% {
+                background: rgba(99, 102, 241, 0.08);
+            }
+
+            50% {
+                background: rgba(99, 102, 241, 0.15);
+            }
+        }
+
+        .bb-table td {
+            padding: 0.9rem 1.5rem;
+            font-size: 1.05rem;
+            vertical-align: middle;
+        }
+
+        .bb-class-name {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #fff;
+        }
+
+        .bb-class-name .grade-badge {
+            display: inline-block;
+            background: #4f46e5;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .bb-lesson {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .bb-teacher {
+            color: #94a3b8;
+        }
+
+        .bb-classroom {
+            color: #64748b;
+        }
+
+        .bb-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
+            border-radius: 100px;
+        }
+
+        .bb-status.active {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .bb-status.active .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: dotPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .bb-status.absent {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .bb-status.normal {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94a3b8;
+        }
+
+        /* ========= SCROLLING TICKER ========= */
+        .bb-ticker {
+            background: #111827;
+            border-top: 1px solid #1e293b;
+            padding: 0.65rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .bb-ticker-content {
+            display: inline-block;
+            animation: tickerScroll 35s linear infinite;
+            padding-left: 100%;
+        }
+
+        .bb-ticker-content span {
+            margin-right: 4rem;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        .bb-ticker-content span i {
+            color: #fbbf24;
+            margin-right: 0.4rem;
+        }
+
+        @keyframes tickerScroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* ========= LAYOUT ========= */
+        .bb-layout {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* ========= FULLSCREEN ========= */
+        body:fullscreen .bb-actions .fullscreen-text {
+            display: none;
+        }
+
+        /* ========= AUTO-PAGE INDICATOR ========= */
+        .bb-page-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: #111827;
+        }
+
+        .bb-page-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #334155;
+            transition: all 0.3s;
+        }
+
+        .bb-page-dot.active {
+            background: #6366f1;
+            width: 24px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bb-layout">
+        <!-- HEADER -->
+        <div class="bb-header">
+            <div class="bb-logo">
+                <img src="../edusync-logo.png" alt="EduSync">
+                <h1>Edu<span>Sync</span> Canlı Pano</h1>
+            </div>
+            <div class="bb-clock-area">
+                <div class="bb-date" id="bbDate"></div>
+                <div class="bb-clock" id="bbClock">--<span class="blink">:</span>--</div>
+                <div class="bb-period-badge" id="bbPeriod">
+                    <i class="fas fa-circle-dot"></i>
+                    <span>Yükleniyor...</span>
+                </div>
+            </div>
+            <div class="bb-actions">
+                <button onclick="toggleFullscreen()" title="Tam Ekran">
+                    <i class="fas fa-expand"></i>
+                </button>
+                <button onclick="window.location.href='dasboard-parent.html'" title="Veli Paneline Dön">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- PERIOD TABS -->
+        <div class="bb-period-bar" id="bbPeriodBar"></div>
+
+        <!-- TABLE -->
+        <div class="bb-table-container">
+            <div class="bb-table-scroll" id="bbTableScroll">
+                <table class="bb-table">
+                    <thead>
+                        <tr>
+                            <th style="width:100px"><i class="fas fa-door-open"></i> Sınıf</th>
+                            <th><i class="fas fa-book"></i> Ders</th>
+                            <th><i class="fas fa-user-tie"></i> Öğretmen</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Derslik</th>
+                            <th style="width:90px"><i class="fas fa-clock"></i> Saat</th>
+                            <th style="width:120px"><i class="fas fa-signal"></i> Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bbTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PAGE INDICATOR -->
+        <div class="bb-page-indicator" id="bbPageIndicator"></div>
+
+        <!-- TICKER -->
+        <div class="bb-ticker">
+            <div class="bb-ticker-content" id="bbTicker">
+                <span><i class="fas fa-info-circle"></i> EduSync Canlı Ders Panosu — Tüm sınıflar anlık olarak
+                    güncellenmektedir.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import class data from parent script -->
+    <script>
+        // ===== SCHEDULE PERIODS =====
+        const PERIODS = [
+            { label: '1. Ders', start: '08:30', end: '09:10' },
+            { label: '2. Ders', start: '09:20', end: '10:00' },
+            { label: '3. Ders', start: '10:00', end: '10:40' },
+            { label: '4. Ders', start: '10:50', end: '11:30' },
+            { label: '5. Ders', start: '11:40', end: '12:20' },
+            { label: '6. Ders', start: '13:00', end: '13:40' },
+            { label: '7. Ders', start: '13:50', end: '14:30' }
+        ];
+
+        const ROWS_PER_PAGE = 12;
+        let currentPage = 0;
+        let totalPages = 1;
+        let autoPageTimer = null;
+
+        // ===== CLOCK =====
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('bbClock').innerHTML = `${h}<span class="blink">:</span>${m}`;
+
+            const days = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+            const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+            document.getElementById('bbDate').textContent =
+                `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+            // Update period badge
+            updateCurrentPeriod(now);
+        }
+
+        function timeToMin(str) {
+            const [h, m] = str.split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function updateCurrentPeriod(now) {
+            const current = now.getHours() * 60 + now.getMinutes();
+            const badge = document.getElementById('bbPeriod');
+            let found = false;
+
+            for (let i = 0; i < PERIODS.length; i++) {
+                const p = PERIODS[i];
+                const s = timeToMin(p.start);
+                const e = timeToMin(p.end);
+                if (current >= s && current < e) {
+                    badge.className = 'bb-period-badge';
+                    badge.innerHTML = `<i class="fas fa-circle-dot"></i><span>${p.label} — ${p.start}-${p.end}</span>`;
+                    found = true;
+                    break;
+                }
+                // Check if between periods (teneffüs)
+                if (i < PERIODS.length - 1) {
+                    const nextStart = timeToMin(PERIODS[i + 1].start);
+                    if (current >= e && current < nextStart) {
+                        badge.className = 'bb-period-badge teneffus';
+                        badge.innerHTML = `<i class="fas fa-mug-hot"></i><span>Teneffüs</span>`;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!found) {
+                badge.className = 'bb-period-badge bitti';
+                badge.innerHTML = `<i class="fas fa-moon"></i><span>Ders Dışı</span>`;
+            }
+        }
+
+        // ===== PERIOD TABS =====
+        function renderPeriodTabs(now) {
+            const bar = document.getElementById('bbPeriodBar');
+            const current = now.getHours() * 60 + now.getMinutes();
+
+            bar.innerHTML = PERIODS.map(p => {
+                const s = timeToMin(p.start);
+                const e = timeToMin(p.end);
+                let cls = 'bb-period-tab';
+                if (current >= s && current < e) cls += ' active';
+                else if (current >= e) cls += ' completed';
+                return `<div class="${cls}">${p.label}  ${p.start}–${p.end}</div>`;
+            }).join('');
+        }
+
+        // ===== BUILD TABLE =====
+        function getCurrentLessonForClass(classInfo, now) {
+            const current = now.getHours() * 60 + now.getMinutes();
+
+            for (const lesson of classInfo.schedule) {
+                const parts = lesson.time.split(' - ');
+                if (parts.length < 2) continue;
+                const s = timeToMin(parts[0].trim());
+                const e = timeToMin(parts[1].trim());
+                if (current >= s && current < e) {
+                    return { ...lesson, isCurrent: true };
+                }
+            }
+
+            // Find next upcoming lesson
+            for (const lesson of classInfo.schedule) {
+                const parts = lesson.time.split(' - ');
+                if (parts.length < 2) continue;
+                const s = timeToMin(parts[0].trim());
+                if (current < s) {
+                    return { ...lesson, isCurrent: false, isNext: true };
+                }
+            }
+
+            // All lessons done
+            return null;
+        }
+
+        function buildTableRows() {
+            if (typeof classData === 'undefined') return;
+
+            const now = new Date();
+            renderPeriodTabs(now);
+
+            const allClasses = Object.keys(classData).sort((a, b) => {
+                const ga = parseInt(a);
+                const gb = parseInt(b);
+                if (ga !== gb) return ga - gb;
+                return a.localeCompare(b);
+            });
+
+            const rowsData = allClasses.map(cn => {
+                const info = classData[cn];
+                const lesson = getCurrentLessonForClass(info, now);
+                const isAbsent = info.substitutes && info.substitutes.length > 0;
+
+                return {
+                    className: cn,
+                    grade: cn.charAt(0),
+                    lessonName: lesson ? lesson.subject : '—',
+                    teacher: lesson ? lesson.teacher : '—',
+                    classroom: lesson ? lesson.classroom : '—',
+                    time: lesson ? lesson.time : '—',
+                    isCurrent: lesson ? lesson.isCurrent : false,
+                    isNext: lesson ? !!lesson.isNext : false,
+                    isAbsent: isAbsent
+                };
+            });
+
+            totalPages = Math.max(1, Math.ceil(rowsData.length / ROWS_PER_PAGE));
+            if (currentPage >= totalPages) currentPage = 0;
+
+            const pageRows = rowsData.slice(currentPage * ROWS_PER_PAGE, (currentPage + 1) * ROWS_PER_PAGE);
+
+            const tbody = document.getElementById('bbTableBody');
+            tbody.innerHTML = pageRows.map(r => {
+                const rowClass = r.isCurrent ? 'highlight-row' : '';
+                const gradeColors = { '5': '#6366f1', '6': '#8b5cf6', '7': '#ec4899', '8': '#f59e0b' };
+                const badgeColor = gradeColors[r.grade] || '#6366f1';
+
+                let statusHtml;
+                if (r.time === '—') {
+                    statusHtml = `<span class="bb-status normal"><i class="fas fa-check"></i> Bitti</span>`;
+                } else if (r.isAbsent) {
+                    statusHtml = `<span class="bb-status absent"><i class="fas fa-user-slash"></i> İzinli</span>`;
+                } else if (r.isCurrent) {
+                    statusHtml = `<span class="bb-status active"><span class="dot"></span> Aktif</span>`;
+                } else if (r.isNext) {
+                    statusHtml = `<span class="bb-status normal"><i class="fas fa-hourglass-half"></i> Sırada</span>`;
+                } else {
+                    statusHtml = `<span class="bb-status normal"><i class="fas fa-clock"></i> Bekliyor</span>`;
+                }
+
+                return `
+                    <tr class="${rowClass}">
+                        <td>
+                            <span class="bb-class-name">${r.className}
+                                <span class="grade-badge" style="background:${badgeColor}">${r.grade}. Sınıf</span>
+                            </span>
+                        </td>
+                        <td class="bb-lesson">${r.lessonName}</td>
+                        <td class="bb-teacher">${r.teacher}</td>
+                        <td class="bb-classroom">${r.classroom}</td>
+                        <td style="color:#94a3b8;font-variant-numeric:tabular-nums">${r.time}</td>
+                        <td>${statusHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Page indicator
+            const indicator = document.getElementById('bbPageIndicator');
+            if (totalPages <= 1) {
+                indicator.style.display = 'none';
+            } else {
+                indicator.style.display = 'flex';
+                indicator.innerHTML = Array.from({ length: totalPages }, (_, i) =>
+                    `<div class="bb-page-dot ${i === currentPage ? 'active' : ''}"></div>`
+                ).join('');
+            }
+        }
+
+        // ===== AUTO-PAGING =====
+        function startAutoPaging() {
+            if (autoPageTimer) clearInterval(autoPageTimer);
+            autoPageTimer = setInterval(() => {
+                currentPage = (currentPage + 1) % totalPages;
+                buildTableRows();
+            }, 8000); // 8 seconds per page
+        }
+
+        // ===== FULLSCREEN =====
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // ===== TICKER FROM API =====
+        async function loadTicker() {
+            try {
+                const res = await fetch('/api/parent-info');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.length === 0) return;
+
+                const ticker = document.getElementById('bbTicker');
+                ticker.innerHTML = data.map(d =>
+                    `<span><i class="fas fa-bullhorn"></i> ${d.title}${d.content ? ' — ' + d.content : ''}</span>`
+                ).join('') +
+                    `<span><i class="fas fa-info-circle"></i> EduSync Canlı Ders Panosu — Tüm sınıflar anlık olarak güncellenmektedir.</span>`;
+            } catch (e) {
+                console.error('Ticker load error:', e);
+            }
+        }
+
+        // ===== INIT =====
+        // Load classData from external file
+        const script = document.createElement('script');
+        script.src = 'script.js';
+        script.onload = function () {
+            updateClock();
+            buildTableRows();
+            startAutoPaging();
+            loadTicker();
+
+            setInterval(updateClock, 1000);
+            setInterval(buildTableRows, 30000); // Refresh table every 30s
+            setInterval(loadTicker, 30000);      // Refresh ticker every 30s
+        };
+        document.head.appendChild(script);
+    </script>
+</body>
+
+</html>

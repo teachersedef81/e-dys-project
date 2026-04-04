@@ -1,107 +1,147 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Okul Bilgi Portalı - Veli Girişi</title>
+    <title>EduSync - Veli Portalı</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="style.css">
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        indigo: {
+                            600: 'var(--primary-color)',
+                            700: 'var(--primary-dark)',
+                            800: 'var(--primary-dark)',
+                        },
+                        orange: {
+                            500: 'var(--warning-color)',
+                            600: '#ea580c',
+                        },
+                        slate: {
+                            50: 'var(--background-color)',
+                            100: 'var(--border-color)',
+                            800: 'var(--text-primary)',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Header -->
-        <header class="mb-8">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h1 class="text-3xl font-bold text-blue-800">Okul Bilgi Portalı</h1>
-                    <p class="text-gray-600">Veli Bilgilendirme Portalı</p>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="relative" id="notificationContainer">
-                        <button id="notificationButton" class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg flex items-center">
-                            <i class="fas fa-bell mr-2"></i>
-                            <span>Bildirimler</span>
-                            <span id="notificationBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">3</span>
-                        </button>
-                        <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-10">
-                            <div class="p-3 border-b border-gray-200">
-                                <h3 class="font-semibold text-gray-800">Bildirimler</h3>
-                            </div>
-                            <div class="max-h-96 overflow-y-auto">
-                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                                            <i class="fas fa-flag text-blue-600"></i>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm font-medium text-gray-800">Voleybol Turnuvası</p>
-                                            <p class="text-xs text-gray-500">Okulumuz voleybol takımı TÜrkiye finallerine katılmaya hak kazandı.</p>
-                                            <p class="text-xs text-gray-400 mt-1">2 saat önce</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0 bg-green-100 rounded-full p-2">
-                                            <i class="fas fa-bus text-green-600"></i>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm font-medium text-gray-800">Bilim Müzesi Gezisi</p>
-                                            <p class="text-xs text-gray-500">5. ve 6. sınıflar için 18 Nisan tarihinde bilim müzesi gezisi düzenlenecektir.</p>
-                                            <p class="text-xs text-gray-400 mt-1">1 gün önce</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3 hover:bg-gray-50 border-b border-gray-100">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0 bg-purple-100 rounded-full p-2">
-                                            <i class="fas fa-book text-purple-600"></i>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm font-medium text-gray-800">Kitap Fuarı</p>
-                                            <p class="text-xs text-gray-500">Kütüphaneler haftası dolayısıyla okul kütüphanesinde kitap fuarı düzenlenecektir.</p>
-                                            <p class="text-xs text-gray-400 mt-1">2 gün önce</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="p-2 text-center border-t border-gray-200">
-                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Tüm bildirimleri gör</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
-            </div>
-        </header>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+    <!-- Shared Navbar -->
+    <nav class="parent-navbar">
+        <div class="brand">
+            <img src="../edusync-logo.png" alt="EduSync" style="height:40px;border-radius:8px;">
+            <h1>EduSync Veli</h1>
+        </div>
 
-        <!-- Notification Banner -->
-        <div class="mb-8 overflow-hidden">
-            <div class="notification-banner text-white py-3 px-4 rounded-lg whitespace-nowrap">
-                <span class="font-bold mr-4"><i class="fas fa-exclamation-circle mr-2"></i>ÖNEMLİ DUYURU:</span>
-                <span class="text-sm md:text-base">23 Nisan Ulusal Egemenlik ve Çocuk Bayramı töreni 23 Nisan Pazartesi günü saat 10:00'da okul bahçesinde yapılacaktır.</span>
+        <div class="flex items-center space-x-6">
+            <div class="user-badge">
+                <i class="fas fa-user-friends"></i> <span>Veli Portalı</span>
+            </div>
+            
+            <a href="billboard.html"
+                class="flex items-center text-indigo-600 hover:text-indigo-800 font-medium px-3 py-2 rounded-lg transition-colors text-sm"
+                title="Canlı Ders Panosu — TV Ekranında Göstermek İçin">
+                <i class="fas fa-tv mr-2"></i> Canlı Pano
+            </a>
+            <button class="theme-toggle" id="themeToggle" title="Temayı Değiştir" style="color: var(--primary-color); background: rgba(79, 70, 229, 0.1); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(79, 70, 229, 0.2); border-radius: 50%;">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button onclick="window.location.href='../index.html'"
+                class="flex items-center text-slate-500 hover:text-red-500 font-medium transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i> Çıkış
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-6 py-8 max-w-6xl">
+
+        <!-- Parent Intro Alert -->
+        <div
+            class="mb-8 bg-indigo-50 border border-indigo-100 rounded-xl p-5 flex items-start space-x-4 shadow-[0_4px_20px_rgb(0,0,0,0.03)]">
+            <div class="bg-indigo-600 text-white rounded-lg p-2 mt-1">
+                <i class="fas fa-info-circle text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-semibold text-indigo-900 text-lg">Sayın Veli, Hoş Geldiniz!</h3>
+                <p class="text-slate-600 mt-1">Öğrencinize ait güncel ders programlarına, kulüp faaliyetlerine ve
+                    okulumuz tarafından yapılan genel duyurulara bu portal üzerinden dilediğiniz zaman ulaşabilirsiniz.
+                </p>
+            </div>
+        </div>
+
+        <!-- Latest Announcement Banner Container -->
+        <div id="latestAnnouncementBanner"
+            class="mb-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-[0_10px_30px_rgb(249,115,22,0.2)] hidden relative overflow-hidden">
+            <div class="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+                <i class="fas fa-bullhorn text-9xl"></i>
+            </div>
+            <div class="relative z-10 flex items-start justify-between">
+                <div>
+                    <span
+                        class="bg-white text-orange-600 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm"
+                        id="bannerType">Duyuru</span>
+                    <h2 class="text-2xl font-bold mt-3 mb-1" id="bannerTitle">Başlık</h2>
+                    <p class="mt-1 text-orange-50 text-base" id="bannerContent">İçerik...</p>
+                </div>
+                <div class="text-sm font-medium opacity-90 bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm"
+                    id="bannerDate">Tarih</div>
+            </div>
+        </div>
+
+        <!-- Notification Banner (Scrolling) -->
+        <div class="mb-8 overflow-hidden rounded-xl shadow-sm border border-slate-100">
+            <div class="bg-indigo-600 text-white py-3 px-4 whitespace-nowrap overflow-hidden text-ellipsis">
+                <span class="font-bold mr-4 bg-white/20 px-2 py-1 rounded-md text-sm"><i
+                        class="fas fa-exclamation-circle mr-2"></i>ÖNEMLİ BİLGİ:</span>
+                <span class="text-sm md:text-base opacity-90">Sisteme Hoş Geldiniz. Bu portal üzerinden öğrencinizin tüm
+                    bilgilerini anlık olarak takip edebilirsiniz.</span>
             </div>
         </div>
 
         <!-- Main Content -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- Grade Filter -->
-            <div class="lg:col-span-1 bg-white rounded-xl shadow-md p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <div
+                class="lg:col-span-1 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 p-6">
+                <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
                     <i class="fas fa-filter mr-2 text-blue-600"></i>
                     Sınıf Filtreleri
                 </h2>
                 <div class="mb-6">
                     <label class="block text-gray-700 mb-2">Sınıf Seviyesi</label>
                     <div class="grid grid-cols-4 gap-2">
-                        <button class="grade-level-btn py-2 rounded-lg bg-blue-600 text-white font-medium">5</button>
-                        <button class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium">6</button>
-                        <button class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium">7</button>
-                        <button class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium">8</button>
+                        <button
+                            class="grade-level-btn py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition">5</button>
+                        <button
+                            class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition">6</button>
+                        <button
+                            class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition">7</button>
+                        <button
+                            class="grade-level-btn py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition">8</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2">Şube</label>
+                    <div id="sections-container" class="grid grid-cols-6 gap-2">
+                        <!-- Dynamically populated by script.js -->
                     </div>
                 </div>
             </div>
@@ -151,7 +191,8 @@
                             </div>
                             <p class="text-sm text-gray-600 mb-2">Tarih: 18 Nisan 2025</p>
                             <p class="text-sm text-gray-600 mb-2">Sınıflar: 5. ve 6. Sınıflar</p>
-                            <p class="text-sm text-gray-600 mb-3">Açıklama: Öğrencilerin bilim ve teknoloji alanında gelişimine katkı sağlamak amacıyla düzenlenen gezi.</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Öğrencilerin bilim ve teknoloji alanında
+                                gelişimine katkı sağlamak amacıyla düzenlenen gezi.</p>
                             <a href="#" class="text-green-600 text-sm font-medium flex items-center">
                                 İzin Formunu İndir <i class="fas fa-download ml-1 text-xs"></i>
                             </a>
@@ -172,7 +213,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Competitions -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
@@ -189,7 +230,8 @@
                             </div>
                             <p class="text-sm text-gray-600 mb-2">Tarih: 18 Nisan 2025</p>
                             <p class="text-sm text-gray-600 mb-2">Konum: Çanakkale Spor Salonu</p>
-                            <p class="text-sm text-gray-600 mb-3">Açıklama: Türkiye finallerine kalan okulumuz voleybol takımının müsabakaları.</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Türkiye finallerine kalan okulumuz voleybol
+                                takımının müsabakaları.</p>
                             <a href="#" class="text-yellow-600 text-sm font-medium flex items-center">
                                 Detayları Gör <i class="fas fa-external-link-alt ml-1 text-xs"></i>
                             </a>
@@ -203,7 +245,8 @@
                             </div>
                             <p class="text-sm text-gray-600 mb-2">Tarih: 10-17 Haziran 2025</p>
                             <p class="text-sm text-gray-600 mb-2">Konum: Hürriyet Ortaokulu Konferans Salonu</p>
-                            <p class="text-sm text-gray-600 mb-3">Açıklama: Öğrencilerimizin SHORE kapsamında hazırladıkları kısa filmin gösterimi ve yıl sonu şenlikleri</p>
+                            <p class="text-sm text-gray-600 mb-3">Açıklama: Öğrencilerimizin SHORE kapsamında
+                                hazırladıkları kısa filmin gösterimi ve yıl sonu şenlikleri</p>
                             <a href="#" class="text-yellow-600 text-sm font-medium flex items-center">
                                 Detayları Gör <i class="fas fa-external-link-alt ml-1 text-xs"></i>
                             </a>
@@ -347,7 +390,8 @@
 
     <!-- Class Card Template -->
     <template id="classCardTemplate">
-        <div class="class-card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 text-center cursor-pointer transition-all duration-300 relative overflow-hidden">
+        <div
+            class="class-card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 text-center cursor-pointer transition-all duration-300 relative overflow-hidden">
             <div class="absolute -top-10 -right-10 w-20 h-20 rounded-full bg-blue-500 opacity-10"></div>
             <div class="text-3xl font-bold text-blue-800 mb-2 class-name">5A</div>
             <div class="text-sm text-gray-600 mb-3 teacher-name">Sınıf Öğretmeni: Mustafa TOPCAN</div>
@@ -363,6 +407,55 @@
             </div>
         </div>
     </template>
+    <!-- Shared Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section footer-brand">
+                <div class="footer-logo">
+                    <img src="../edusync-logo.png" alt="EduSync Logo" class="footer-logo-img">
+                    <h3>EduSync</h3>
+                </div>
+                <p>EduSync Veli Portalı: Çocuğunuzun eğitim sürecini anlık takip edin, okul ile güçlü bir bağ kurun.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Hızlı Erişim</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link"><i class="fas fa-calendar-alt"></i> Ders Programı</a>
+                    <a href="#" class="footer-link"><i class="fas fa-bullhorn"></i> Duyurular</a>
+                    <a href="#" class="footer-link"><i class="fas fa-tv"></i> Canlı Pano</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Kurumsal</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link"><i class="fas fa-info-circle"></i> Hakkımızda</a>
+                    <a href="#" class="footer-link"><i class="fas fa-shield-alt"></i> Veri Güvenliği</a>
+                    <a href="#" class="footer-link"><i class="fas fa-envelope"></i> Bize Ulaşın</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Destek</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link"><i class="fas fa-question-circle"></i> Sıkça Sorulanlar</a>
+                    <a href="#" class="footer-link"><i class="fas fa-book"></i> Veli Kılavuzu</a>
+                    <a href="#" class="footer-link"><i class="fas fa-headset"></i> Teknik Destek</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>© 2026 EduSync. Tüm hakları saklıdır. | Güvenli Veli Bilgilendirme Sistemi</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="script.js"></script>
 </body>
+
 </html>

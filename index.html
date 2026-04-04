@@ -1,182 +1,247 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-DYS - Giriş Yap</title>
+    <title>EduSync - Giriş Yap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Genel Sayfa Stilleri */
+        /* Genel Sayfa Stilleri - Modern Flat UI */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #005a9c 0%, #003a6c 100%);
+            font-family: 'Outfit', sans-serif;
+            background: #f4f7f6;
+            /* Açık arka plan */
+            background-image: radial-gradient(circle at 10% 20%, rgb(255, 200, 124) 0%, rgb(252, 251, 121) 90%);
+            /* Hafif modern turuncu-sarı gradient arka plan fantezisi */
+            background-size: cover;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            color: #334155;
         }
 
         /* Giriş Konteyneri */
         .login-container {
-            background-color: white;
-            padding: 40px 50px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            padding: 48px 56px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            /* Yumuşak geniş gölge */
             width: 100%;
-            max-width: 420px;
+            max-width: 460px;
             text-align: center;
-            transition: transform 0.3s ease;
-        }
-        .login-container:hover {
-            transform: scale(1.02);
+            border: 1px solid rgba(255, 255, 255, 0.7);
         }
 
         .login-logo {
-            width: 100px;
+            width: 120px;
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+            background: #fff;
+            padding: 4px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 10px;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
         }
 
         p {
-            color: #666;
-            margin-bottom: 30px;
+            color: #64748b;
+            margin-bottom: 32px;
+            font-size: 15px;
         }
 
-        /* --- YENİ EKLENEN SEKMELİ YAPI İÇİN STİLLER --- */
+        /* Sekme Butonları */
         .tab-buttons {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #eee;
+            margin-bottom: 28px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 4px;
         }
 
         .tab-button {
-            flex: 1; /* Butonların eşit genişlikte olmasını sağlar */
-            padding: 15px 10px;
+            flex: 1;
+            padding: 12px 0;
             cursor: pointer;
-            background: none;
+            background: transparent;
             border: none;
-            font-size: 16px;
-            font-weight: bold;
-            color: #888;
-            border-bottom: 3px solid transparent; /* Pasif sekme için şeffaf alt çizgi */
-            transition: color 0.3s, border-color 0.3s;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         .tab-button:hover {
-            color: #333;
+            color: #0f172a;
         }
 
         .tab-button.active {
-            color: #007bff;
-            border-bottom-color: #007bff; /* Aktif sekme için renkli alt çizgi */
+            background-color: #ffffff;
+            color: #f97316;
+            /* Turuncu Vurgu */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            /* Seçili sekmeye gölge */
         }
-        
-        /* Sekme içeriğini gizlemek için */
+
+        /* Sekme Gösterimi */
         .tab-content {
             display: none;
+            animation: fadeIn 0.4s ease-out;
         }
 
         .tab-content.active {
             display: block;
         }
-        /* --- STİL EKLEMELERİ SONU --- */
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* Form Elemanları */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 20px;
             text-align: left;
         }
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #475569;
         }
 
         input[type="text"],
         input[type="password"] {
+            font-family: 'Outfit', sans-serif;
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            font-size: 15px;
+            color: #1e293b;
+            background-color: #f8fafc;
+            transition: all 0.3s;
         }
 
         input[type="text"]:focus,
         input[type="password"]:focus {
             outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-        }
-        
-        button {
-            width: 100%; /* Butonun tam genişlikte olması için */
-            padding: 12px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            border-color: #f97316;
+            /* Turuncu odak */
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
         }
 
-        button:hover {
-            background-color: #0056b3;
+        button[type="submit"] {
+            font-family: 'Outfit', sans-serif;
+            width: 100%;
+            padding: 14px;
+            background-color: #4f46e5;
+            /* İndigo Ana Buton Rengi */
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+
+        button[type="submit"]:hover {
+            background-color: #4338ca;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+
+        button[type="submit"]:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
-        <img src="images/meb-logo.jpeg" alt="Milli Eğitim Bakanlığı Logosu" class="login-logo">
-        <h1>E-DYS'e Hoş Geldiniz</h1>
+        <img src="edusync-logo.png" alt="EduSync Logosu" class="login-logo">
+        <h1>EduSync'e Hoş Geldiniz</h1>
         <p>Lütfen devam etmek için giriş yapın.</p>
-        
+
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="openTab('teacher')">Öğretmen Girişi</button>
-            <button class="tab-button" onclick="openTab('parent')">Veli Girişi</button>
+            <button class="tab-button" onclick="openTab('admin')">İdare</button>
+            <button class="tab-button active" onclick="openTab('teacher')">Öğretmen</button>
+            <button class="tab-button" onclick="openTab('parent')">Veli</button>
+        </div>
+
+        <div id="admin" class="tab-content">
+            <form id="adminForm">
+                <input type="hidden" name="role" value="admin">
+                <div class="form-group">
+                    <label for="admin-username">Kullanıcı Adı</label>
+                    <input type="text" id="admin-username" name="username" required placeholder="Örn: admin">
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Şifre</label>
+                    <input type="password" id="admin-password" name="password" required placeholder="123456">
+                </div>
+                <button type="submit">Giriş Yap</button>
+            </form>
         </div>
 
         <div id="teacher" class="tab-content active">
-            <form action="dashboard.html">
-                 <input type="hidden" name="role" value="teacher">
+            <form id="teacherForm">
+                <input type="hidden" name="role" value="teacher">
                 <div class="form-group">
                     <label for="teacher-username">Kullanıcı Adı (MEBBİS)</label>
-                    <input type="text" id="teacher-username" name="username" required>
+                    <input type="text" id="teacher-username" name="username" required placeholder="Örn: teacher1">
                 </div>
                 <div class="form-group">
                     <label for="teacher-password">Şifre</label>
-                    <input type="password" id="teacher-password" name="password" required>
+                    <input type="password" id="teacher-password" name="password" required placeholder="123456">
                 </div>
                 <button type="submit">Giriş Yap</button>
             </form>
         </div>
 
         <div id="parent" class="tab-content">
-            <form action="parent/dasboard-parent.html"> <input type="hidden" name="role" value="parent">
+            <form id="parentForm">
+                <input type="hidden" name="role" value="parent">
                 <div class="form-group">
-                    <label for="parent-username">Öğrenci T.C. Kimlik Numarası</label>
-                    <input type="text" id="parent-username" name="username" required>
+                    <label for="parent-username">T.C. Kimlik Numarası</label>
+                    <input type="text" id="parent-username" name="username" required placeholder="Örn: 12345678900">
                 </div>
                 <div class="form-group">
-                    <label for="parent-password">Öğrenci Okul Numarası</label>
-                    <input type="password" id="parent-password" name="password" required>
+                    <label for="parent-password">Okul Numarası (Şifre)</label>
+                    <input type="password" id="parent-password" name="password" required placeholder="123456">
                 </div>
                 <button type="submit">Giriş Yap</button>
             </form>
         </div>
-        </div>
+    </div>
 
     <script>
         function openTab(tabName) {
@@ -196,7 +261,47 @@
             document.getElementById(tabName).style.display = "block";
             event.currentTarget.className += " active";
         }
+
+        async function handleLogin(e, role) {
+            e.preventDefault();
+            const form = e.target;
+            const username = form.username.value;
+            const password = form.password.value;
+            const submitBtn = form.querySelector('button');
+
+            submitBtn.textContent = 'Giriş Yapılıyor...';
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, role })
+                });
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('edusync_token', data.token);
+                    if (role === 'admin') window.location.href = '/admin/dashboard-admin.html';
+                    else if (role === 'teacher') window.location.href = '/dashboard.html';
+                    else window.location.href = '/parent/dasboard-parent.html';
+                } else {
+                    alert(data.error || 'Giriş başarısız!');
+                    submitBtn.textContent = 'Giriş Yap';
+                    submitBtn.disabled = false;
+                }
+            } catch (err) {
+                alert('Sunucu hatası: ' + err.message);
+                submitBtn.textContent = 'Giriş Yap';
+                submitBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('adminForm').addEventListener('submit', (e) => handleLogin(e, 'admin'));
+        document.getElementById('teacherForm').addEventListener('submit', (e) => handleLogin(e, 'teacher'));
+        document.getElementById('parentForm').addEventListener('submit', (e) => handleLogin(e, 'parent'));
     </script>
 
 </body>
+
 </html>

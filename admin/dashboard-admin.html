@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSync — İdareci Yönetim Paneli</title>
+    <meta name="description"
+        content="EduSync İdareci Paneli: okul istatistikleri, duyuru yönetimi, ders programı ve öğretmen bilgileri.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body class="admin-body">
+
+    <!-- ========== NAVBAR ========== -->
+    <nav class="admin-navbar">
+        <div class="brand">
+            <img src="../edusync-logo.png" alt="EduSync" style="height:40px;border-radius:8px;">
+            <h1>EduSync İdare</h1>
+        </div>
+        <div class="nav-actions">
+            <span class="user-badge"><i class="fas fa-shield-alt"></i> Kurum İdaresi</span>
+            <button class="theme-toggle" id="themeToggle" title="Temayı Değiştir" style="color: var(--primary-color); background: rgba(79, 70, 229, 0.1); width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(79, 70, 229, 0.2);">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="btn-nav danger" onclick="logout()" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Çıkış
+            </button>
+        </div>
+    </nav>
+
+    <!-- ========== MAIN WRAPPER ========== -->
+    <div class="admin-wrapper">
+
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <h2><i class="fas fa-hand-sparkles"></i> Hoş Geldiniz, Sayın İdareci</h2>
+            <p>Okul istatistiklerini, duyuruları, ders programını ve öğretmen bilgilerini bu panelden yönetebilirsiniz.
+            </p>
+        </div>
+
+        <!-- ========== STAT CARDS ========== -->
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-icon indigo"><i class="fas fa-chalkboard-teacher"></i></div>
+                <div class="stat-info">
+                    <h3 id="statTeachers">0</h3>
+                    <p>Toplam Öğretmen</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon emerald"><i class="fas fa-user-graduate"></i></div>
+                <div class="stat-info">
+                    <h3 id="statStudents">0</h3>
+                    <p>Toplam Öğrenci</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon amber"><i class="fas fa-bullhorn"></i></div>
+                <div class="stat-info">
+                    <h3 id="statAnnouncements">0</h3>
+                    <p>Aktif Duyuru</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rose"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-info">
+                    <h3 id="statDocuments">0</h3>
+                    <p>Bekleyen Belge</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== TAB NAVIGATION ========== -->
+        <div class="admin-tabs" id="adminTabs">
+            <button class="admin-tab-btn active" data-tab="genel-durum">
+                <i class="fas fa-chart-pie"></i> Genel Durum
+            </button>
+            <button class="admin-tab-btn" data-tab="duyuru">
+                <i class="fas fa-bullhorn"></i> Duyuru Yönetimi
+            </button>
+            <button class="admin-tab-btn" data-tab="program">
+                <i class="fas fa-calendar-alt"></i> Ders Programı
+            </button>
+            <button class="admin-tab-btn" data-tab="ogretmenler">
+                <i class="fas fa-users"></i> Öğretmen Listesi
+            </button>
+            <button class="admin-tab-btn" data-tab="ayarlar">
+                <i class="fas fa-cog"></i> Sistem Ayarları
+            </button>
+        </div>
+
+        <!-- ===================================================
+             TAB 1 — GENEL DURUM
+             =================================================== -->
+        <div class="admin-tab-content active" id="tab-genel-durum">
+            <div class="two-col">
+                <!-- Chart -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Belge Durum Grafiği</h3>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="documentChart"></canvas>
+                    </div>
+                </div>
+                <!-- Stats -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3><i class="fas fa-clipboard-list"></i> Belge İstatistikleri</h3>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:1rem;">
+                        <div class="stat-card" style="box-shadow:none;border:none;padding:0.75rem;">
+                            <div class="stat-icon indigo"><i class="fas fa-folder"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statsTotal" style="font-size:1.3rem;">-</h3>
+                                <p>Toplam Belge</p>
+                            </div>
+                        </div>
+                        <div class="stat-card" style="box-shadow:none;border:none;padding:0.75rem;">
+                            <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statsPending" style="font-size:1.3rem;">-</h3>
+                                <p>Onay Bekleyen</p>
+                            </div>
+                        </div>
+                        <div class="stat-card" style="box-shadow:none;border:none;padding:0.75rem;">
+                            <div class="stat-icon emerald"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info">
+                                <h3 id="statsApproved" style="font-size:1.3rem;">-</h3>
+                                <p>Onaylanan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Announcements -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-newspaper"></i> Son Duyurular</h3>
+                </div>
+                <div id="recentAnnouncements" class="announcement-list">
+                    <div class="admin-empty"><i class="fas fa-inbox"></i>
+                        <p>Henüz duyuru yok.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================
+             TAB 2 — DUYURU YÖNETİMİ
+             =================================================== -->
+        <div class="admin-tab-content" id="tab-duyuru">
+            <div class="two-col">
+                <!-- Form -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3><i class="fas fa-paper-plane"></i> Yeni Duyuru Gönder</h3>
+                    </div>
+                    <form id="announcementForm">
+                        <div class="admin-form-group">
+                            <label for="annType">Duyuru Türü</label>
+                            <select id="annType" class="admin-select" required>
+                                <option value="duyuru">Genel Okul Duyurusu</option>
+                                <option value="ders_programi">Ders Programı Değişikliği</option>
+                                <option value="nobet">Öğretmen Nöbet Bilgisi</option>
+                                <option value="toplanti">Veli Toplantısı</option>
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="annTarget">Hedef Kitle / Sınıf</label>
+                            <select id="annTarget" class="admin-select">
+                                <option value="">Tüm Okul / Genel</option>
+                                <option value="5A">5-A Sınıfı</option>
+                                <option value="5B">5-B Sınıfı</option>
+                                <option value="6A">6-A Sınıfı</option>
+                                <option value="6B">6-B Sınıfı</option>
+                                <option value="7A">7-A Sınıfı</option>
+                                <option value="8A">8-A Sınıfı</option>
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="annTitle">Başlık</label>
+                            <input type="text" id="annTitle" class="admin-input" required
+                                placeholder="Örn: 2026-2027 Eğitim Öğretim Yılı Açılışı...">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="annContent">Mesaj İçeriği</label>
+                            <textarea id="annContent" class="admin-textarea" rows="5" required
+                                placeholder="Sayın velilerimiz..."></textarea>
+                        </div>
+                        <button type="submit" class="admin-btn primary" id="annSubmitBtn">
+                            <i class="fas fa-paper-plane"></i> Tüm Velilere Yayınla
+                        </button>
+                    </form>
+                </div>
+                <!-- List -->
+                <div class="admin-card">
+                    <div class="admin-card-header">
+                        <h3><i class="fas fa-list"></i> Gönderilmiş Duyurular</h3>
+                    </div>
+                    <div id="announcementList" class="announcement-list">
+                        <div class="admin-empty"><i class="fas fa-inbox"></i>
+                            <p>Henüz duyuru gönderilmedi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================
+             TAB 3 — DERS PROGRAMI
+             =================================================== -->
+        <div class="admin-tab-content" id="tab-program">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Haftalık Ders Programı (Örnek)</h3>
+                </div>
+                <div class="schedule-grid">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Saat</th>
+                                <th>Pazartesi</th>
+                                <th>Salı</th>
+                                <th>Çarşamba</th>
+                                <th>Perşembe</th>
+                                <th>Cuma</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>08:30</strong></td>
+                                <td>Türkçe</td>
+                                <td>Matematik</td>
+                                <td>Fen Bilgisi</td>
+                                <td>Sosyal Bilgiler</td>
+                                <td>İngilizce</td>
+                            </tr>
+                            <tr>
+                                <td><strong>09:20</strong></td>
+                                <td>Matematik</td>
+                                <td>Türkçe</td>
+                                <td>Matematik</td>
+                                <td>Fen Bilgisi</td>
+                                <td>Türkçe</td>
+                            </tr>
+                            <tr>
+                                <td><strong>10:10</strong></td>
+                                <td>Fen Bilgisi</td>
+                                <td>Sosyal Bilgiler</td>
+                                <td>Türkçe</td>
+                                <td>Matematik</td>
+                                <td>Beden Eğitimi</td>
+                            </tr>
+                            <tr>
+                                <td><strong>11:00</strong></td>
+                                <td>İngilizce</td>
+                                <td>Müzik</td>
+                                <td>Sosyal Bilgiler</td>
+                                <td>İngilizce</td>
+                                <td>Görsel Sanatlar</td>
+                            </tr>
+                            <tr>
+                                <td><strong>11:50</strong></td>
+                                <td>Din Kültürü</td>
+                                <td>Fen Bilgisi</td>
+                                <td>İngilizce</td>
+                                <td>Türkçe</td>
+                                <td>Matematik</td>
+                            </tr>
+                            <tr>
+                                <td><strong>13:10</strong></td>
+                                <td>Görsel Sanatlar</td>
+                                <td>Beden Eğitimi</td>
+                                <td>Rehberlik</td>
+                                <td>Teknoloji & Tasarım</td>
+                                <td>Sosyal Bilgiler</td>
+                            </tr>
+                            <tr>
+                                <td><strong>14:00</strong></td>
+                                <td>Teknoloji & Tasarım</td>
+                                <td>Rehberlik</td>
+                                <td>Beden Eğitimi</td>
+                                <td>Müzik</td>
+                                <td>Din Kültürü</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="margin-top:1rem;font-size:0.85rem;color:#64748b;">
+                    <i class="fas fa-info-circle"></i> Ders programı verileri ileride dosya yükleme ile dinamik olarak
+                    güncellenebilir.
+                </p>
+            </div>
+        </div>
+
+        <!-- ===================================================
+             TAB 4 — ÖĞRETMEN LİSTESİ
+             =================================================== -->
+        <div class="admin-tab-content" id="tab-ogretmenler">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-user-plus"></i> Yeni Öğretmen Ekle</h3>
+                </div>
+                <form id="teacherForm"
+                    style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:0.75rem;align-items:end;">
+                    <div class="admin-form-group" style="margin-bottom:0;">
+                        <label>Ad Soyad</label>
+                        <input type="text" id="tName" class="admin-input" required placeholder="Ahmet Yılmaz">
+                    </div>
+                    <div class="admin-form-group" style="margin-bottom:0;">
+                        <label>Branş</label>
+                        <input type="text" id="tBranch" class="admin-input" required placeholder="Matematik">
+                    </div>
+                    <div class="admin-form-group" style="margin-bottom:0;">
+                        <label>Telefon</label>
+                        <input type="text" id="tPhone" class="admin-input" placeholder="05xx xxx xx xx">
+                    </div>
+                    <div class="admin-form-group" style="margin-bottom:0;">
+                        <label>E-posta</label>
+                        <input type="text" id="tEmail" class="admin-input" placeholder="ahmet@okul.edu.tr">
+                    </div>
+                    <button type="submit" class="admin-btn primary" style="height:44px;">
+                        <i class="fas fa-plus"></i> Ekle
+                    </button>
+                </form>
+            </div>
+
+            <!-- Excel Upload -->
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-file-excel"></i> Excel ile Toplu Öğretmen Yükleme</h3>
+                </div>
+                <p style="font-size:0.85rem;color:#64748b;margin-bottom:1rem;">
+                    <i class="fas fa-info-circle"></i>
+                    Excel dosyanızda sütun başlıkları şu şekilde olmalıdır: <strong>Ad Soyad</strong>,
+                    <strong>Branş</strong>, <strong>Telefon</strong>, <strong>E-posta</strong> (ilk satır başlık).
+                </p>
+                <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+                    <label for="excelFileInput" class="admin-btn primary" style="cursor:pointer;margin:0;">
+                        <i class="fas fa-upload"></i> Excel Dosyası Seç (.xlsx / .xls)
+                    </label>
+                    <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none;">
+                    <span id="excelFileName" style="font-size:0.85rem;color:#64748b;">Dosya seçilmedi</span>
+                </div>
+                <div id="excelPreview" style="margin-top:1rem;display:none;">
+                    <p style="font-weight:600;margin-bottom:0.5rem;"><i class="fas fa-eye"></i> Önizleme (<span
+                            id="excelRowCount">0</span> öğretmen bulundu):</p>
+                    <div class="admin-table-wrap" style="max-height:300px;overflow-y:auto;">
+                        <table class="admin-table" id="excelPreviewTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Ad Soyad</th>
+                                    <th>Branş</th>
+                                    <th>Telefon</th>
+                                    <th>E-posta</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excelPreviewBody"></tbody>
+                        </table>
+                    </div>
+                    <button id="excelImportBtn" class="admin-btn success" style="margin-top:1rem;">
+                        <i class="fas fa-database"></i> Tümünü Sisteme Aktar
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-users"></i> Kayıtlı Öğretmenler</h3>
+                </div>
+                <div class="admin-table-wrap">
+                    <table class="admin-table" id="teacherTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Ad Soyad</th>
+                                <th>Branş</th>
+                                <th>Telefon</th>
+                                <th>E-posta</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacherTableBody">
+                            <tr>
+                                <td colspan="6" class="admin-empty"><i class="fas fa-user-slash"></i>
+                                    <p>Henüz öğretmen kaydı yok.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================
+             TAB 5 — SİSTEM AYARLARI
+             =================================================== -->
+        <div class="admin-tab-content" id="tab-ayarlar">
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <h3><i class="fas fa-cog"></i> Okul Bilgileri</h3>
+                </div>
+                <form id="settingsForm">
+                    <div class="settings-grid">
+                        <div class="admin-form-group">
+                            <label>Okul Adı</label>
+                            <input type="text" class="admin-input" value="EduSync Ortaokulu" id="setSchool">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>İl / İlçe</label>
+                            <input type="text" class="admin-input" value="İstanbul / Kadıköy" id="setCity">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Eğitim Öğretim Yılı</label>
+                            <input type="text" class="admin-input" value="2025-2026" id="setYear">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Kurum Kodu</label>
+                            <input type="text" class="admin-input" value="123456" id="setCode">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Müdür Adı</label>
+                            <input type="text" class="admin-input" placeholder="Adı Soyadı" id="setPrincipal">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>İletişim Telefonu</label>
+                            <input type="text" class="admin-input" placeholder="0216 xxx xx xx" id="setPhone">
+                        </div>
+                    </div>
+                    <div style="margin-top:1.5rem;">
+                        <button type="submit" class="admin-btn primary">
+                            <i class="fas fa-save"></i> Ayarları Kaydet
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div><!-- /admin-wrapper -->
+
+    <!-- Mapping Modal -->
+    <div class="admin-modal-overlay" id="mappingModal">
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h3><i class="fas fa-columns"></i> Sütun Eşleştirme (e-Okul)</h3>
+                <button class="btn-close" onclick="closeMappingModal()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:1.2rem;"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="admin-modal-content">
+                <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem;">
+                    Excel dosyanızdaki sütun başlıklarını sistemdeki alanlarla eşleştirin. 
+                    Otomatik eşleme yapılamayan alanları manuel seçebilirsiniz.
+                </p>
+                <div id="mappingContainer">
+                    <!-- Dynamic rows here -->
+                </div>
+            </div>
+            <div class="admin-modal-footer">
+                <button class="admin-btn" onclick="closeMappingModal()">İptal</button>
+                <button class="admin-btn primary" id="confirmMappingBtn">
+                    <i class="fas fa-check-circle"></i> Eşleştirmeyi Onayla
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="admin-toast-container" id="toastContainer"></div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section footer-brand">
+                <div class="footer-logo">
+                    <img src="../edusync-logo.png" alt="EduSync Logo" class="footer-logo-img">
+                    <h3>EduSync</h3>
+                </div>
+                <p>EduSync: Modern Eğitim Yönetimi ve İdari İşbirliği Platformu. Yapay zeka destekli süreçlerle okulunuzu geleceğe taşıyın.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Hızlı Erişim</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link"><i class="fas fa-file-invoice"></i> Belge Yönetimi</a>
+                    <a href="#" class="footer-link"><i class="fas fa-users"></i> Personel Listesi</a>
+                    <a href="#" class="footer-link"><i class="fas fa-cog"></i> Sistem Ayarları</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Kurumsal</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link"><i class="fas fa-info-circle"></i> Hakkımızda</a>
+                    <a href="#" class="footer-link"><i class="fas fa-shield-alt"></i> Güvenlik Politikası</a>
+                    <a href="#" class="footer-link"><i class="fas fa-envelope"></i> İletişim</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h4>Destek</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link"><i class="fas fa-question-circle"></i> Yardım Merkezi</a>
+                    <a href="#" class="footer-link"><i class="fas fa-book"></i> Kullanım Kılavuzu</a>
+                    <a href="#" class="footer-link"><i class="fas fa-headset"></i> Teknik Destek</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>© 2026 EduSync. Tüm hakları saklıdır. | Türkiye'nin Modern E-DYS Çözümü</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script src="script-admin.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+{
+  "name": "e--dys-projesi",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teachersedef81/e-dys-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/teachersedef81/e-dys-project/issues"
+  },
+  "homepage": "https://github.com/teachersedef81/e-dys-project#readme",
+  "description": "",
+  "dependencies": {
+    "@google/genai": "^1.43.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "sqlite3": "^5.1.7"
+  }
+}

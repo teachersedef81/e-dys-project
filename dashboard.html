@@ -1,727 +1,62 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-DYS - Gelişmiş Yönetim Paneli</title>
-   
+    <title>EduSync - Gelişmiş Yönetim Paneli</title>
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 
-  
 </head>
+
 <body>
-    <style>
-
-          .login-logo {
-    width: 150px; /* Logonun genişliğini 150 piksel yapar */
-    height: auto; /* Yüksekliği orantılı ayarlar */
-    margin-bottom: 30px; /* Altında 30 piksel boşluk bırakır */
-    display: block; /* Blok seviyesinde olmasını sağlar (gerekirse ortalamak için) */
-    margin-left: auto; /* Sağa yaslar (ortalamak için diğer yöntem) */
-    margin-right: auto; /* Sola yaslar (ortalamak için diğer yöntem) */
-}
-
-/* Daha küçük bir logo için */
-/*
-.login-logo {
-    width: 100px;
-    height: auto;
-    margin-bottom: 15px;
-}
-*/
-
-
-.login-logo {
-    max-width: 200px;
-    width: 100%; 
-    height: auto;
-    margin-bottom: 25px;
-}
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary-color: #64748b;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --background-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        [data-theme="dark"] {
-            --primary-color: #3b82f6;
-            --background-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        /* Header Styles */
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow-lg);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .header-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        .header-meb-logo {
-    width: 45px; /* Boyutunu ayarlar */
-    height: 45px;
-    border-radius: 50%; /* Yuvarlak yapar */
-    background-color: white; /* JPG olduğu için beyaz arka plan ekleyerek sırıtmasını önler */
-    padding: 3px; /* İçten küçük bir boşluk */
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-}
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .theme-toggle {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .user-menu {
-            position: relative;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .user-avatar:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Main Container */
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            display: grid;
-            gap: 2rem;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        /* Profile Settings */
-        .profile-settings {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            background: var(--background-color);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .checkbox-group:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            accent-color: var(--primary-color);
-        }
-
-        /* Form Styles */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-label {
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .form-input, .form-select {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background: var(--card-bg);
-            color: var(--text-primary);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-input:disabled, .form-select:disabled {
-            background: var(--background-color);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        /* File Upload */
-        .file-upload {
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-upload-input {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .file-upload-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 2rem;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            background: var(--background-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .file-upload-label:hover {
-            border-color: var(--primary-color);
-            background: rgba(37, 99, 235, 0.05);
-        }
-
-        .file-upload.has-file .file-upload-label {
-            border-color: var(--success-color);
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        /* Recipients */
-        .recipients-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .recipient-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: var(--background-color);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .recipient-option:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .recipient-option.selected {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-warning {
-            background: var(--warning-color);
-            color: white;
-        }
-
-        .btn-secondary {
-            background: var(--secondary-color);
-            color: white;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        /* Tabs */
-        .tabs-container {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-            overflow: hidden;
-        }
-
-        .tab-nav {
-            display: flex;
-            background: var(--background-color);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        .tab-btn.active {
-            color: var(--primary-color);
-            background: var(--card-bg);
-        }
-
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary-color);
-        }
-
-        .tab-content {
-            display: none;
-            padding: 2rem;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Table */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card-bg);
-        }
-
-        .table th {
-            background: var(--background-color);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            color: var(--text-primary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table tr:hover {
-            background: var(--background-color);
-        }
-
-        /* Status Badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .status-waiting {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--warning-color);
-        }
-
-        .status-approved {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-        }
-
-        .status-rejected {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger-color);
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: var(--success-color);
-        }
-
-        .notification.error {
-            background: var(--danger-color);
-        }
-
-        .notification.warning {
-            background: var(--warning-color);
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 1rem;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                padding: 0 1rem;
-            }
-            
-            .tab-nav {
-                flex-direction: column;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-secondary);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-        /* ==================
-   FOOTER STİLLERİ
-   ================== */
-footer {
-    background: var(--background-color);
-    color: var(--text-secondary);
-    padding: 3rem 2rem 0 2rem; /* Üst boşluğu artırdık, alt boşluk alttaki bölümden gelecek */
-    margin-top: 2rem;
-    border-top: 1px solid var(--border-color);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.footer-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive yapı */
-    gap: 2.5rem;
-}
-
-.footer-section h4 {
-    color: var(--text-primary);
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem; /* Başlık ve linkler arası boşluk */
-    position: relative;
-}
-
-.footer-section h4::after {
-    content: '';
-    position: absolute;
-    bottom: -0.5rem;
-    left: 0;
-    width: 30px;
-    height: 3px;
-    background: var(--primary-color);
-    border-radius: 2px;
-}
-
-.footer-logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.footer-logo-img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
-.footer-brand h3 {
-    color: var(--text-primary);
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.footer-brand p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin: 0;
-    line-height: 1.2;
-}
-
-.footer-links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.footer-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.footer-link:hover {
-    color: var(--primary-color);
-    transform: translateX(5px); /* Hover efekti */
-}
-
-.footer-link i {
-    width: 16px;
-    text-align: center;
-}
-
-.footer-bottom {
-    max-width: 1400px;
-    margin: 3rem auto 0 auto;
-    padding: 1.5rem 0;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.footer-bottom p {
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.footer-social {
-    display: flex;
-    gap: 1rem;
-}
-
-.social-link {
-    color: var(--text-secondary);
-    font-size: 1.2rem;
-    transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.social-link:hover {
-    color: var(--primary-color);
-    transform: translateY(-2px);
-}
-
-    </style>
     <header class="header">
         <div class="header-content">
             <div class="header-left">
-               <img src="images/meb-logo.jpeg" alt="Milli Eğitim Bakanlığı Logosu" class="login-logo">
-                <h1 class="header-title">E-DYS</h1>
+                <img src="edusync-logo.png" alt="EduSync" style="height: 44px; border-radius: 8px;">
+                <h1 class="header-title">Öğretmen Çalışma Alanı</h1>
             </div>
+
             <div class="header-right">
-                <button class="theme-toggle" id="themeToggle">
+                <div class="header-user-badge" id="headerUserBadge">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span id="headerTeacherName">Öğretmen</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Temayı Değiştir">
                     <i class="fas fa-moon"></i>
                 </button>
                 <div class="user-menu">
-                    <div class="user-avatar">
+                    <div class="user-avatar" title="Kullanıcı Menüsü">
                         <i class="fas fa-user"></i>
                     </div>
                 </div>
+                <button onclick="window.location.href='index.html'" class="btn btn-secondary"
+                    style="margin-left: 1rem; background-color: var(--danger-color); border: none; padding: 0.5rem 1rem; border-radius: 6px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-sign-out-alt" style="margin-right: 5px;"></i> Çıkış
+                </button>
             </div>
         </div>
     </header>
 
     <main class="main-container">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner fade-in" id="welcomeBanner">
+            <div class="welcome-text">
+                <h2 id="welcomeTitle">Hoş Geldiniz, Sayın Öğretmen</h2>
+                <p>Belgelerinizi yönetebilir, AI ile tutanak oluşturabilir ve sınıf istatistiklerini takip edebilirsiniz.</p>
+            </div>
+            <div class="inst-info">
+                <span id="bannerSchool"><i class="fas fa-school"></i> Okul Belirtilmedi</span>
+                <span id="bannerYear"><i class="fas fa-calendar-alt"></i> Yıl Belirtilmedi</span>
+            </div>
+        </div>
         <!-- Profile Settings -->
         <div class="card fade-in">
             <div class="card-header">
@@ -734,6 +69,10 @@ footer {
                 Rollerinize göre ilgili sekmeler aşağıda belirecektir.
             </p>
             <div class="profile-settings">
+                <div class="form-group" style="width: 100%; margin-bottom: 1rem;">
+                    <label class="form-label" for="teacherName">Ad Soyad</label>
+                    <input type="text" id="teacherName" class="form-input" placeholder="Örn: Ahmet Yılmaz">
+                </div>
                 <label class="checkbox-group">
                     <input type="checkbox" id="isHomeroomTeacher">
                     <i class="fas fa-chalkboard-teacher"></i>
@@ -744,6 +83,35 @@ footer {
                     <i class="fas fa-users"></i>
                     Kulüp Danışman Öğretmeniyim
                 </label>
+            </div>
+
+            <!-- Institution Settings -->
+            <div class="profile-settings"
+                style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                <h3 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; width: 100%;">Kurum Bilgileri
+                    (Yapay Zeka İçin)</h3>
+                <div class="form-grid" style="width: 100%;">
+                    <div class="form-group">
+                        <label class="form-label" for="instProvince">İl</label>
+                        <input type="text" id="instProvince" class="form-input" placeholder="Örn: Ankara">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="instDistrict">İlçe</label>
+                        <input type="text" id="instDistrict" class="form-input" placeholder="Örn: Çankaya">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="instSchool">Okul Adı</label>
+                        <input type="text" id="instSchool" class="form-input" placeholder="Örn: Atatürk Ortaokulu">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="instYear">Eğitim Öğretim Yılı</label>
+                        <input type="text" id="instYear" class="form-input" placeholder="Örn: 2023-2024">
+                    </div>
+                </div>
+                <div style="width: 100%; margin-top: 1rem; text-align: right;">
+                    <button type="button" id="saveInstBtn" class="btn btn-primary btn-sm"><i class="fas fa-save"></i>
+                        Bilgileri Kaydet</button>
+                </div>
             </div>
         </div>
 
@@ -777,7 +145,8 @@ footer {
                 <div class="form-group">
                     <label class="form-label">Dosya Seçin</label>
                     <div class="file-upload" id="fileUpload">
-                        <input type="file" id="documentFile" class="file-upload-input" accept=".doc,.docx,.pdf" required>
+                        <input type="file" id="documentFile" class="file-upload-input" accept=".doc,.docx,.pdf"
+                            required>
                         <label for="documentFile" class="file-upload-label">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <span id="fileUploadText">Dosya seçin veya buraya sürükleyin</span>
@@ -813,7 +182,96 @@ footer {
             </form>
         </div>
 
-        <<div class="tabs-container fade-in">
+        <!-- AI Minute Generator -->
+        <div class="card fade-in" id="aiGeneratorCard">
+            <div class="card-header"
+                style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; margin: -1.5rem -1.5rem 1.5rem -1.5rem; padding: 1.5rem; border-radius: 12px 12px 0 0;">
+                <h2 class="card-title" style="color: white; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-magic"></i>
+                    Yapay Zeka ile Tutanak Oluştur
+                </h2>
+                <span class="status-badge" style="background: rgba(255,255,255,0.2); color: white;"><i
+                        class="fas fa-bolt"></i> Gemini AI</span>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Toplantıda alınan kararları veya önemli notları kısaca aşağıya yazın. Yapay zeka sizin yerinize
+                saniyeler içinde resmi MEB formatında bir tutanak hazırlayacaktır.
+            </p>
+            <form id="aiGeneratorForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="aiMainCategory">Belge Kategorisi</label>
+                        <select id="aiMainCategory" class="form-select" required>
+                            <option value="" disabled selected>Ana kategori seçin...</option>
+                            <option value="idari">İdari Evraklar</option>
+                            <option value="rehberlik">Sınıf Rehberlik Evrakları</option>
+                            <option value="kulup">Kulüp Evrakları</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="aiDocumentType">Belge Türü</label>
+                        <select id="aiDocumentType" class="form-select" required disabled>
+                            <option value="">Önce kategori seçin...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="form-label" for="aiPrompt">Toplantı Notları / Özet</label>
+                    <textarea id="aiPrompt" class="form-input" rows="4"
+                        placeholder="Örn: 8/B sınıfı 1. dönem veli toplantısı, katılım azdı, telefon kullanımı yasaklandı..."
+                        required style="resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group" id="aiResultContainer" style="display: none; margin-top: 1.5rem;">
+                    <label class="form-label">Üretilen Tutanak Metni (Düzenlenebilir Taslak)</label>
+                    <textarea id="aiResult" class="form-input" rows="15"
+                        style="width: 100%; padding: 1rem; resize: vertical; font-family: 'Times New Roman', Times, serif; font-size: 1.1rem; line-height: 1.8; background-color: #ffffff; border: 2px solid #8b5cf6; border-radius: 8px; white-space: pre-wrap;"
+                        placeholder="Yapay zeka metni buraya gelecek, üzerinde değişiklik yapabilirsiniz."></textarea>
+                    <p style="font-size: 0.85rem; color: #ef4444; margin-top: 0.5rem;"><i class="fas fa-exclamation-triangle"></i> Lütfen içeriği kontrol edin ve gerekirse düzenleyin. Mevzuat gereği insan denetimi zorunludur.</p>
+                </div>
+
+                <div class="form-group" style="margin-top: 1.5rem;">
+                    <label class="form-label">Gönderilecek Gruplar</label>
+                    <div class="recipients-grid">
+                        <label class="recipient-option ai-recipient">
+                            <input type="checkbox" name="aiRecipient" value="Zümre Öğretmenleri">
+                            <i class="fas fa-user-graduate"></i>
+                            Zümre Öğretmenleri
+                        </label>
+                        <label class="recipient-option ai-recipient">
+                            <input type="checkbox" name="aiRecipient" value="Şube Öğretmenleri">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            Sınıfın Diğer Öğretmenleri
+                        </label>
+                        <label class="recipient-option ai-recipient">
+                            <input type="checkbox" name="aiRecipient" value="Öğrenciler">
+                            <i class="fas fa-child"></i>
+                            Öğrenciler
+                        </label>
+                        <label class="recipient-option ai-recipient">
+                            <input type="checkbox" name="aiRecipient" value="İdareciler">
+                            <i class="fas fa-user-tie"></i>
+                            İdareciler
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+                    <button type="button" class="btn" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 150px;" id="generateAiBtn">
+                        <i class="fas fa-wand-magic-sparkles"></i> Tutanağı Üret
+                    </button>
+                    <button type="button" class="btn" style="background-color: #10b981; color: white; flex: 1; min-width: 150px; display: none;" id="downloadPdfBtn">
+                        <i class="fas fa-file-pdf"></i> Resmi PDF İndir
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="aiSubmitBtn" disabled style="flex: 1; min-width: 150px;">
+                        <i class="fas fa-paper-plane"></i> Onaya Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="tabs-container fade-in">
             <div class="tab-nav">
                 <button class="tab-btn active" data-tab="idari">
                     <i class="fas fa-folder"></i>
@@ -826,6 +284,18 @@ footer {
                 <button class="tab-btn" data-tab="kulup" id="kulupTabBtn" style="display: none;">
                     <i class="fas fa-users"></i>
                     Kulübüm
+                </button>
+                <button class="tab-btn" data-tab="yoklama">
+                    <i class="fas fa-user-check"></i>
+                    Yoklama
+                </button>
+                <button class="tab-btn" data-tab="karardestek">
+                    <i class="fas fa-chart-pie"></i>
+                    Karar Destek Paneli
+                </button>
+                <button class="tab-btn" data-tab="veliiletisim">
+                    <i class="fas fa-bullhorn"></i>
+                    Veli İletişim
                 </button>
             </div>
 
@@ -843,7 +313,7 @@ footer {
                             </tr>
                         </thead>
                         <tbody>
-                           </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -862,16 +332,16 @@ footer {
                             </tr>
                         </thead>
                         <tbody>
-                           </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
             <div class="tab-content" id="kulupContent">
-                 <div class="table-container">
+                <div class="table-container">
                     <table class="table">
                         <thead>
-                             <tr>
+                            <tr>
                                 <th>Belge Adı</th>
                                 <th>Belge Türü</th>
                                 <th>Gönderilen Gruplar</th>
@@ -881,27 +351,119 @@ footer {
                             </tr>
                         </thead>
                         <tbody>
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </main>
 
-  
-        
-  <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <div class="footer-logo">
-                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiNmZmZmZmYiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzZWIiIHN0cm9rZS13aWR0aD0iMiI+CjxwYXRoIGQ9Im0xNiAxNiA0LTQtNC00Ii8+CjxwYXRoIGQ9Im0xMiAxNiA0LTQtNC00Ii8+CjxwYXRoIGQ9Im0xMyAyMC00LTQgNC00Ii8+Cjwvc3ZnPgo8L3N2Zz4K" alt="E-DYS Logo" class="footer-logo-img">
-                    <div class="footer-brand">
-                        <h3>E-DYS</h3>
-                        <p>Eğitimde Doküman Takip Sistemi</p>
+            <!-- Yeni Katmanlar: U2, U4, U1 -->
+            <div class="tab-content" id="yoklamaContent">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Dijital Yoklama ve Sınıf Defteri</h2>
+                    </div>
+                    <form id="attendanceForm">
+                        <div class="form-grid" style="margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label for="attendanceDate" class="form-label">Tarih</label>
+                                <input type="date" id="attendanceDate" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Öğrenci No / Adı</th>
+                                        <th>Durum (Var / Yok / Geç)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody">
+                                    <!-- Öğrenciler JS ile eklenecek -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Yoklamayı
+                            Kaydet</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="tab-content" id="karardestekContent">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Akıllı Karar Destek Paneli</h2>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <canvas id="documentChart"></canvas>
+                        </div>
+                        <div>
+                            <div class="card" style="background: var(--background-color);">
+                                <h3 style="margin-bottom: 1rem;">Sistem Özeti</h3>
+                                <p id="statsTotal" style="margin-top: 0.5rem; font-size: 1.1rem;">Toplam Belge:
+                                    <strong>Yükleniyor...</strong>
+                                </p>
+                                <p id="statsPending"
+                                    style="margin-top: 0.5rem; font-size: 1.1rem; color: var(--warning-color);">Onay
+                                    Bekleyen: <strong>Yükleniyor...</strong></p>
+                                <p id="statsApproved"
+                                    style="margin-top: 0.5rem; font-size: 1.1rem; color: var(--success-color);">
+                                    Onaylanan: <strong>Yükleniyor...</strong></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
+            <div class="tab-content" id="veliiletisimContent">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Veli İletişim Portalı - Mesaj Gönder</h2>
+                    </div>
+                    <form id="parentAnnouncementForm">
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label">Duyuru Türü</label>
+                            <select id="announcementType" class="form-select" required>
+                                <option value="duyuru">Genel Duyuru</option>
+                                <option value="ders_programi">Ders Programı Değişikliği</option>
+                                <option value="nobet">Nöbet / Etkinlik Bilgisi</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label">Başlık</label>
+                            <input type="text" id="announcementTitle" class="form-input" required
+                                placeholder="Örn: Veli Toplantısı Hakkında...">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                            <label class="form-label">Mesaj İçeriği</label>
+                            <textarea id="announcementContent" class="form-input" rows="5" required
+                                placeholder="Sayın velilerimiz..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Velilere Gönder
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjUiIGN5PSIyNSIgcj0iMjUiIGZpbGw9IiNmZmZmZmYiLz4KPHN2ZyB4PSIxMiIgeT0iMTIiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTYzZWIiIHN0cm9rZS13aWR0aD0iMiI+CjxwYXRoIGQ9Im0xNiAxNiA0LTQtNC00Ii8+CjxwYXRoIGQ9Im0xMiAxNiA0LTQtNC00Ii8+CjxwYXRoIGQ9Im0xMyAyMC00LTQgNC00Ii8+Cjwvc3ZnPgo8L3N2Zz4K"
+                        alt="EduSync Logo" class="footer-logo-img">
+                    <div class="footer-brand">
+                        <h3>EduSync</h3>
+                        <p>Modern Eğitim Yönetim Sistemi</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="footer-section">
                 <h4>Hızlı Erişim</h4>
                 <div class="footer-links">
@@ -919,7 +481,7 @@ footer {
                     </a>
                 </div>
             </div>
-            
+
             <div class="footer-section">
                 <h4>Destek</h4>
                 <div class="footer-links">
@@ -937,7 +499,7 @@ footer {
                     </a>
                 </div>
             </div>
-            
+
             <div class="footer-section">
                 <h4>Bilgi</h4>
                 <div class="footer-links">
@@ -956,10 +518,10 @@ footer {
                 </div>
             </div>
         </div>
-        
+
         <div class="footer-bottom">
             <div class="footer-bottom-content">
-                <p>&copy; 2025 E-DYS. Tüm hakları saklıdır.</p>
+                <p>&copy; 2025 EduSync. Tüm hakları saklıdır.</p>
                 <div class="footer-social">
                     <a href="#" class="social-link" title="MEB Resmi Sitesi">
                         <i class="fas fa-globe"></i>
@@ -974,9 +536,8 @@ footer {
             </div>
         </div>
     </footer>
-    <script src="script.js"></script> 
-  
-</body>
-</html>
+    <script src="script.js"></script>
 
-   
+</body>
+
+</html>
