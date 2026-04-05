@@ -8,9 +8,23 @@ import { showNotification } from './ui.js';
 
 export async function generateContent(promptTxt, context) {
     try {
+        let systemPrompt = "";
+        const docType = context.documentType || "";
+        
+        if (docType.includes("Şube Öğretmenler")) {
+            systemPrompt = "\n\n[SİSTEM KOMUTU: Bu metni resmi MEB ŞÖK (Şube Öğretmenler Kurulu) tutanağı şablonuna getir. Eğitim-öğretim durumunun değerlendirilmesi, öğrenci başarıları, okul-aile işbirliği, alınacak kararlar ve önlemler başlıklarını kesinlikle içer. Resmi, kurumsal ve nesnel bir dil kullan. Sonuna katılımcıların imza atabileceği bir imza sirküsü tablosu ekle.]";
+        } else if (docType.includes("Zümre Öğretmenler") || docType.includes("Zümre")) {
+            systemPrompt = "\n\n[SİSTEM KOMUTU: Bu metni resmi MEB Zümre Öğretmenler Kurulu tutanağı şablonuna getir. Öğretim programlarının uygulanması, başarıyı artırıcı tedbirler, ortak sınavlar, proje ve performans görevleri değerlendirmeleri başlıklarını zorunlu tut. Saygıdeğer ve resmi bir dil kullan. Sonuna okul müdürü, zümre başkanı ve öğretmenlerin imzalayabileceği bir imza sirküsü tablosu ekle.]";
+        } else {
+            // Jenerik diğer evraklar için
+            systemPrompt = "\n\n[SİSTEM KOMUTU: Bu metni resmi MEB evrak formatında ve profesyonel bir üslupla düzenle. Gerekli başlık ve maddeleri oluştur. Sonuna katılımcılar için imza sirküsü tablosu ekle.]";
+        }
+
+        const finalPrompt = promptTxt + systemPrompt;
+
         const response = await fetchAPI('/generate-minutes', {
             method: 'POST',
-            body: JSON.stringify({ prompt: promptTxt, context })
+            body: JSON.stringify({ prompt: finalPrompt, context })
         });
         
         if (response && response.ok) {

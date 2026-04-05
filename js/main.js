@@ -156,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 province: document.getElementById('instProvince').value || '',
                 district: document.getElementById('instDistrict').value || '',
                 school: document.getElementById('instSchool').value || '',
-                year: document.getElementById('instYear').value || ''
+                year: document.getElementById('instYear').value || '',
+                documentType: document.getElementById('aiDocumentType')?.value || ''
              };
 
              try {
@@ -164,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('aiResult').value = aiHTML;
                 document.getElementById('aiResultContainer').style.display = 'block';
                 document.getElementById('aiSubmitBtn').disabled = false;
-                document.getElementById('downloadPdfBtn').style.display = 'block';
+                document.getElementById('downloadPdfBtn').style.display = 'flex';
                 showNotification('Tutanak başarıyla üretildi.', 'success');
              } catch(e) {
                  showNotification('Tutanak üretilemedi.', 'error');

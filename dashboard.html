@@ -258,15 +258,17 @@
                 </div>
 
                 <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
-                    <button type="button" class="btn" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 150px;" id="generateAiBtn">
+                    <button type="button" class="btn" style="background-color: #8b5cf6; color: white; flex: 1; min-width: 150px; border-radius: 8px; font-weight: 600;" id="generateAiBtn">
                         <i class="fas fa-wand-magic-sparkles"></i> Tutanağı Üret
                     </button>
-                    <button type="button" class="btn" style="background-color: #10b981; color: white; flex: 1; min-width: 150px; display: none;" id="downloadPdfBtn">
-                        <i class="fas fa-file-pdf"></i> Resmi PDF İndir
-                    </button>
-                    <button type="submit" class="btn btn-primary" id="aiSubmitBtn" disabled style="flex: 1; min-width: 150px;">
-                        <i class="fas fa-paper-plane"></i> Onaya Gönder
-                    </button>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 2; min-width: 250px;">
+                        <button type="submit" class="btn" id="aiSubmitBtn" disabled style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; font-weight: 700; font-size: 1.1rem; padding: 1rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;">
+                            <i class="fas fa-leaf"></i> Doğayı Koru: Dijital Arşive Gönder
+                        </button>
+                        <button type="button" class="btn" id="downloadPdfBtn" style="background-color: transparent; color: var(--text-secondary); border: 1px dashed var(--border-color); font-size: 0.85rem; padding: 0.5rem; border-radius: 8px; display: none; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; cursor: pointer;" onmouseover="this.style.color='#ef4444';this.style.borderColor='#ef4444';" onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)';">
+                            <i class="fas fa-print"></i> (Sadece Islak İmza Zorunluysa) Resmi PDF İndir
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
