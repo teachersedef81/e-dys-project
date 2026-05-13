@@ -142,6 +142,21 @@ class Database {
                 branch TEXT,
                 phone TEXT,
                 email TEXT
+            )`,
+            `CREATE TABLE IF NOT EXISTS kvkk_consents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT,
+                role TEXT,
+                ip TEXT,
+                consented_at TEXT
+            )`,
+            `CREATE TABLE IF NOT EXISTS audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                action TEXT,
+                username TEXT,
+                ip TEXT,
+                detail TEXT,
+                created_at TEXT
             )`
         ];
 

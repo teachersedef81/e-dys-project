@@ -2,7 +2,11 @@
  * api.js
  * Modüler API Yönetimi
  */
-const API_BASE_URL = '/api'; // Use /api since it's served from the same domain typically or update to 'http://localhost:3000/api' if strictly decoupled
+// Sunucu üzerindeyse relative path kullan, dosyadan açılıyorsa mutlak URL kullan
+const API_BASE_URL = window.location.protocol.startsWith('http')
+    ? '/api'
+    : 'http://localhost:3000/api';
+
 
 export async function fetchAPI(endpoint, options = {}) {
     // Auth tokeng injection

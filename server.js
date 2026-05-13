@@ -46,8 +46,8 @@ const checkAuth = (req, res, next) => {
     }
 };
 
-// Protect matching dashboard pages
-app.use(['/dashboard.html', '/admin/dashboard-admin.html', '/parent/dasboard-parent.html'], checkAuth);
+// Protect matching dashboard pages (both correct URL and legacy typo URL)
+app.use(['/dashboard.html', '/admin/dashboard-admin.html', '/parent/dashboard-parent.html', '/parent/dasboard-parent.html'], checkAuth);
 
 // --- SECURITY MIDDLEWARE: SSL Enforcement ---
 app.use((req, res, next) => {
@@ -81,6 +81,30 @@ app.use((req, res, next) => {
 
 // AI Configuration
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// --- RATE LIMITING (in-memory) ---
+const rateLimitStore = new Map();
+
+function rateLimit(maxRequests, windowMs) {
+    return (req, res, next) => {
+        const key = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+        const now = Date.now();
+        const record = rateLimitStore.get(key) || { count: 0, resetTime: now + windowMs };
+        if (now > record.resetTime) {
+            record.count = 0;
+            record.resetTime = now + windowMs;
+        }
+        record.count++;
+        rateLimitStore.set(key, record);
+        if (record.count > maxRequests) {
+            return res.status(429).json({ error: 'Çok fazla istek gönderildi. Lütfen bekleyin.' });
+        }
+        next();
+    };
+}
+
+const loginRateLimit = rateLimit(10, 15 * 60 * 1000);   // 10 deneme / 15 dakika
+const aiRateLimit    = rateLimit(20, 60 * 60 * 1000);   // 20 istek / saat
 
 // --- API Endpoints ---
 
@@ -123,7 +147,7 @@ app.put('/api/documents/:id/status', async (req, res) => {
 });
 
 // 4. Generate AI Minute (Tutanak Oluştur)
-app.post('/api/generate-minutes', async (req, res) => {
+app.post('/api/generate-minutes', aiRateLimit, async (req, res) => {
     try {
         const { prompt, context } = req.body;
         if (!prompt) return res.status(400).json({ error: 'Prompt is required' });
@@ -132,39 +156,150 @@ app.post('/api/generate-minutes', async (req, res) => {
         const district = context?.district || "[İlçe Belirtilmedi]";
         const school = context?.school || "[Okul Adı Belirtilmedi]";
         const year = context?.year || "[Eğitim Öğretim Yılı Belirtilmedi]";
+        const docType = context?.documentType || "";
 
-        const systemInstruction = `Sen uzman bir Milli Eğitim Bakanlığı (MEB) idarecisi ve öğretmenisin. 
-Sana verilen notları kullanarak, "RESMİ YAZIŞMA USUL VE ESASLARI HAKKINDA YÖNETMELİK" (MEB Güncel Mevzuatı) hükümlerine tam uygun bir "Toplantı Tutanağı" taslağı oluşturacaksın.
+        const kurumBilgileri = `
+Kurum Bilgileri:
+İl: ${province} | İlçe: ${district} | Okul: ${school} | Öğretim Yılı: ${year}`;
+
+        let docSpecificInstruction;
+        if (docType.includes("İzin") || docType.includes("Dilekçe") || docType.includes("Başvuru")) {
+            docSpecificInstruction = `Sen uzman bir MEB idari yazışma uzmanısın.
+Verilen bilgileri kullanarak resmi bir DİLEKÇE veya İZİN TALEBİ taslağı hazırlayacaksın.
+
+Uygulanacak Format:
+1. Başlık: T.C. kurum hiyerarşisi (Valiliği → Kaymakamlığı → Okul Adı)
+2. Konu: "...hakkında" ifadesiyle kısa ve net
+3. Makam Hitabı: "Sayın Müdürüm," veya "Müdürlük Makamına,"
+4. Gövde: Açık ve özlü, 1-3 paragraf, 1. tekil şahıs
+5. Kapanış: "Gereğini saygılarımla arz ederim."
+6. İmza Bloğu: Ad-Soyad, Unvan, Tarih, T.C. Kimlik No (opsiyonel)
+${kurumBilgileri}`;
+        } else if (docType.includes("Kaza") || docType.includes("Olay")) {
+            docSpecificInstruction = `Sen uzman bir MEB idari yazışma uzmanısın.
+Verilen bilgileri kullanarak resmi bir KAZA / OLAY TUTANAĞI taslağı hazırlayacaksın.
+
+Uygulanacak Format:
+1. Başlık: T.C. kurum hiyerarşisi
+2. Tutanak Bilgileri: Tarih, Saat, Yer
+3. İlgili Kişiler: Ad-soyad, sınıf/unvan bilgileri
+4. Olayın Kronolojik Anlatımı: Tarafsız, gözlemlenebilir olgulara dayalı
+5. Alınan Önlemler / Yapılan Bildirimler
+6. Tutanağı Düzenleyenler: İmza bölümü (en az 2 yetkili)
+${kurumBilgileri}`;
+        } else if (docType.includes("Rapor") || docType.includes("Başarı")) {
+            docSpecificInstruction = `Sen uzman bir MEB öğretmeni ve rehber öğretmenisin.
+Verilen bilgileri kullanarak resmi bir ÖĞRENCİ BAŞARI RAPORU taslağı hazırlayacaksın.
+
+Uygulanacak Format:
+1. Öğrenci Bilgileri: Ad-Soyad, Sınıf, Öğrenci No
+2. Değerlendirme Dönemi
+3. Ders Bazında Başarı Durumu (tablo formatında)
+4. Genel Değerlendirme: Güçlü yönler, geliştirilecek alanlar
+5. Öğretmen Görüşü ve Önerileri
+6. İmza: Sınıf Öğretmeni, Tarih
+${kurumBilgileri}`;
+        } else if (docType.includes("Görev") || docType.includes("Hizmet Belgesi")) {
+            docSpecificInstruction = `Sen uzman bir MEB idari yazışma uzmanısın.
+Verilen bilgileri kullanarak resmi bir GÖREV / HİZMET BELGESİ TALEBİ taslağı hazırlayacaksın.
+
+Uygulanacak Format:
+1. Başlık: T.C. kurum hiyerarşisi
+2. Konu: Görev/hizmet belgesi talebi
+3. Makam Hitabı
+4. Talep Gerekçesi: Belgenin hangi amaçla istendiği
+5. "Arz ederim." kapanışı
+6. İmza Bloğu
+${kurumBilgileri}`;
+        } else if (docType.includes("Resmi Yazı")) {
+            docSpecificInstruction = `Sen uzman bir MEB idarecisisin.
+Verilen bilgileri kullanarak "RESMİ YAZIŞMA USUL VE ESASLARI HAKKINDA YÖNETMELİK" hükümlerine uygun bir RESMİ YAZI taslağı hazırlayacaksın.
+
+Uygulanacak Format:
+1. Başlık: T.C. kurum hiyerarşisi (tam ve eksiksiz)
+2. Evrak No ve Tarih
+3. Konu
+4. İlgili Makam/Kurum
+5. Yazı Gövdesi: 3. tekil şahıs veya edilgen yapı
+6. GEREĞİ / BİLGİ dağıtım listesi (varsa)
+7. İmza Bloğu: Ad-Soyad, Unvan, Mühür yeri
+${kurumBilgileri}`;
+        } else {
+            docSpecificInstruction = `Sen uzman bir Milli Eğitim Bakanlığı (MEB) idarecisi ve öğretmenisin.
+Sana verilen notları kullanarak, "RESMİ YAZIŞMA USUL VE ESASLARI HAKKINDA YÖNETMELİK" hükümlerine tam uygun bir resmi evrak taslağı oluşturacaksın.
 
 Resmi Yazışma Kuralları:
-1. Başlık: T.C. [İL] VALİLİĞİ / [İLÇE] KAYMAKAMLIĞI ve ardından [OKUL ADI] şeklinde hiyerarşik yapı.
-2. Sayı ve Konu: Sol üstte "Sayı:" ve "Konu:" bölümleri.
-3. Tarih: Sağ üstte standart formatta.
-4. Hitap: Metin "GEREĞİ DÜŞÜNÜLDÜ:" veya gündem maddeleri ile başlamalı.
-5. Dil: Resmi, ciddi, 3. tekil şahıs veya edilgen yapı.
-6. İmza Bloğu: Ad-Soyad ve Unvan (Okul Müdürü, Müdür Yardımcısı, Branş Öğretmeni vb.) için yer bırakılmalı.
+1. Başlık: T.C. kurum hiyerarşisi (Valiliği → Kaymakamlığı → Okul)
+2. Sayı ve Konu: Sol üstte
+3. Tarih: Sağ üstte
+4. Hitap veya GEREĞİ DÜŞÜNÜLDÜ ile başla
+5. Dil: Resmi, 3. tekil şahıs veya edilgen yapı
+6. İmza Bloğu: Unvan ve ad-soyad için yer bırak
+${kurumBilgileri}`;
+        }
 
-Kurum Bilgileri:
-İl: ${province}
-İlçe: ${district}
-Okul Adı: ${school}
-Eğitim Öğretim Yılı: ${year}
+        const systemInstruction = docSpecificInstruction + "\n\nÇıktı Kuralı: Markdown kullanma. Sadece düz metin. Resmi yazışma şablonuna sadık kal.";
 
-Çıktı Kuralı: Markdown kullanma. Sadece düz metin. Resmi yazışma şablonuna sadık kal.`;
+        // Google Gen AI SDK (Gen 2) Client
+        const { GoogleGenAI } = require('@google/genai');
+        const aiModel = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                systemInstruction: systemInstruction,
+        // API Key ile doğrulanmış aktif modeller
+        const modelsToTry = [
+            'gemini-flash-latest', 
+            'gemini-2.0-flash', 
+            'gemini-2.5-flash',
+            'gemini-pro-latest'
+        ];
+        
+        let lastError = null;
+        let resultText = null;
+
+        for (const modelName of modelsToTry) {
+            try {
+                console.log(`[AI] Deneniyor: ${modelName}`);
+                const response = await aiModel.models.generateContent({
+                    model: modelName,
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    config: {
+                        systemInstruction: systemInstruction, // Gen 2'de direkt string veya obje olabilir
+                        temperature: 0.7
+                    }
+                });
+
+                if (response && response.text) {
+                    resultText = response.text;
+                    console.log(`[AI] Başarılı! Model: ${modelName}`);
+                    break;
+                }
+            } catch (modelErr) {
+                console.warn(`[AI] ${modelName} Hatası:`, modelErr.status, modelErr.message);
+                lastError = modelErr;
+                
+                if (modelErr.status === 404) continue;
+                if (modelErr.status === 429 || modelErr.status === 503) {
+                    await new Promise(r => setTimeout(r, 1000));
+                    continue;
+                }
+                break;
             }
-        });
+        }
+
+        if (!resultText) {
+            throw lastError || new Error('Tüm modeller başarısız oldu.');
+        }
 
         const watermark = "\n\n--------------------------------------------------\n[BU BELGE YAPAY ZEKA TARAFINDAN TASLAK OLARAK OLUŞTURULMUŞTUR, ISLAK İMZA ÖNCESİ İDARİ KONTROL ZORUNLUDUR]";
-        res.json({ result: response.text + watermark });
+        res.json({ result: resultText + watermark });
     } catch (error) {
         console.error('AI Generation Error:', error);
-        res.status(500).json({ error: 'Tutanak oluşturulurken bir hata oluştu.' });
+        const statusCode = error.status || 500;
+        const userMsg = statusCode === 503
+            ? 'Yapay zeka servisi şu an yoğun. Lütfen birkaç saniye bekleyip tekrar deneyin.'
+            : statusCode === 429
+            ? 'API kota limiti aşıldı. Lütfen daha sonra tekrar deneyin.'
+            : 'Tutanak oluşturulurken bir hata oluştu.';
+        res.status(500).json({ error: userMsg, detail: error.message });
     }
 });
 
@@ -204,7 +339,7 @@ app.post('/api/parent-info', async (req, res) => {
 });
 
 // 6. Login API with bcrypt
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', loginRateLimit, async (req, res) => {
     try {
         const { username, password, role } = req.body;
         const user = await db.get("SELECT * FROM users WHERE username = ? AND role = ?", [username, role]);
@@ -224,6 +359,23 @@ app.post('/api/login', async (req, res) => {
         res.cookie('edusync_token', token, { httpOnly: false, secure: process.env.NODE_ENV === 'production', maxAge: 2 * 60 * 60 * 1000 });
         
         res.json({ success: true, token, role: user.role });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GEÇİCİ: Kullanıcı şifrelerini sıfırla (development only)
+app.post('/api/reset-users', async (req, res) => {
+    try {
+        await db.run('DELETE FROM users');
+        const h1 = bcrypt.hashSync('123456', 10);
+        const h2 = bcrypt.hashSync('123456', 10);
+        const h3 = bcrypt.hashSync('123456', 10);
+        await db.run('INSERT INTO users (role, username, password_hash) VALUES (?, ?, ?)', ['admin', 'admin', h1]);
+        await db.run('INSERT INTO users (role, username, password_hash) VALUES (?, ?, ?)', ['teacher', 'teacher1', h2]);
+        await db.run('INSERT INTO users (role, username, password_hash) VALUES (?, ?, ?)', ['parent', '12345678900', h3]);
+        const users = await db.query('SELECT id, role, username FROM users');
+        res.json({ success: true, users });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -362,6 +514,51 @@ app.delete('/api/parent-info/:id', async (req, res) => {
     try {
         const result = await db.run("DELETE FROM parent_info WHERE id = ?", [req.params.id]);
         res.json({ success: true, changes: result.changes });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// --- KVKK Endpoints ---
+
+// KVKK onay kaydı (login sırasında)
+app.post('/api/kvkk-consent', async (req, res) => {
+    try {
+        const { username, role } = req.body;
+        const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+        const now = new Date().toISOString();
+        await db.run(
+            "INSERT INTO kvkk_consents (username, role, ip, consented_at) VALUES (?, ?, ?, ?)",
+            [username || 'anonymous', role || 'unknown', ip, now]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// KVKK Madde 11 - Kullanıcı veri silme talebi
+app.delete('/api/user/data', checkAuth, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const username = req.user.username;
+        const role = req.user.role;
+
+        if (role === 'admin') {
+            return res.status(403).json({ error: 'Admin hesabı silinemez.' });
+        }
+
+        await db.run("DELETE FROM users WHERE id = ?", [userId]);
+        await db.run("DELETE FROM kvkk_consents WHERE username = ?", [username]);
+
+        const ip = req.ip || 'unknown';
+        await db.run(
+            "INSERT INTO audit_log (action, username, ip, detail, created_at) VALUES (?, ?, ?, ?, ?)",
+            ['USER_DATA_DELETE', username, ip, `KVKK Madde 11 - kullanıcı kendi verisini sildi`, new Date().toISOString()]
+        );
+
+        res.clearCookie('edusync_token');
+        res.json({ success: true, message: 'Kişisel verileriniz sistemden silindi.' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

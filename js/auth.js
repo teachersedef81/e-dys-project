@@ -24,21 +24,18 @@ function resetInactivityTimer() {
 
 export function initAuthGuard(expectedRole = null) {
     const token = localStorage.getItem('edusync_token');
-    
-    // 1. Check if token exists
-    if (!token) {
+    const isOnServer = window.location.protocol.startsWith('http');
+
+    // 1. Token yoksa: sadece sunucu üzerinde çalışıyorken yönlendir
+    //    file:// protokolünde yönlendirme döngüsüne girer, bu yüzden atla
+    if (!token && isOnServer) {
         performLogout();
         return;
     }
 
-    // 2. Setup inactivity listeners
+    // 2. Hareketsizlik dinleyicileri kur
     document.addEventListener('mousemove', resetInactivityTimer);
-    document.addEventListener('keypress', resetInactivityTimer);
-    document.addEventListener('click', resetInactivityTimer);
+    document.addEventListener('keypress',  resetInactivityTimer);
+    document.addEventListener('click',     resetInactivityTimer);
     resetInactivityTimer();
-
-    // 3. Optional: Quick JWT decoding or hit backend /api/me to check role validity
-    // For now, since it's a frontend guard, if a token exists we let them see the UI.
-    // The backend logic (API route) will throw 401 if they try to fetch data that's not theirs.
-    // However, we could decode the payload manually to check expectedRole if we wanted to be strict.
 }
