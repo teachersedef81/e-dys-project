@@ -1,0 +1,19 @@
+# Ortam değişkenleri - ASLA commit'leme
+.env
+.env.local
+.env.production
+
+# Veritabanı
+*.sqlite
+*.db
+
+# Node
+node_modules/
+
+# Log dosyaları
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
