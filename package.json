@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/teachersedef81/e-dys-project#readme",
   "description": "",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@google/genai": "^1.43.0",
     "bcrypt": "^6.0.0",
