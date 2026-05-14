@@ -1,4 +1,4 @@
-/* ============================================
+﻿/* ============================================
    EduSync Admin Dashboard — Custom Styles
    ============================================ */
 
@@ -34,7 +34,7 @@
 
 .admin-navbar .brand i {
     font-size: 1.5rem;
-    color: #fbbf24;
+    color: #ffffff;
 }
 
 .admin-navbar .brand h1 {
@@ -61,7 +61,7 @@
     color: var(--primary-color);
     font-size: 0.9rem;
     font-weight: 600;
-    border: 1px solid rgba(79, 70, 229, 0.1);
+    border: 1px solid rgba(13,56,128,0.1);
 }
 
 .admin-navbar .user-badge i {
@@ -107,7 +107,7 @@
 
 /* --- Welcome Banner --- */
 .welcome-banner {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    background: linear-gradient(135deg, #0d3880 0%, #082660 100%);
     border-radius: 16px;
     padding: 2rem 2.5rem;
     color: #fff;
@@ -175,7 +175,7 @@
     flex-shrink: 0;
 }
 
-.stat-icon.indigo { background: rgba(79,70,229,0.1); color: #4f46e5; }
+.stat-icon.indigo { background: rgba(13,56,128,0.1); color: #0d3880; }
 .stat-icon.emerald { background: rgba(16,185,129,0.1); color: #10b981; }
 .stat-icon.amber { background: rgba(245,158,11,0.1); color: #f59e0b; }
 .stat-icon.rose { background: rgba(244,63,94,0.1); color: #f43f5e; }
@@ -227,12 +227,12 @@
 }
 
 .admin-tab-btn:hover {
-    color: #4f46e5;
+    color: #0d3880;
     background: rgba(79,70,229,0.05);
 }
 
 .admin-tab-btn.active {
-    background: #4f46e5;
+    background: #0d3880;
     color: #fff;
     box-shadow: 0 2px 8px rgba(79,70,229,0.3);
 }
@@ -282,7 +282,7 @@
 }
 
 .admin-card-header h3 i {
-    color: #4f46e5;
+    color: #0d3880;
 }
 
 /* --- Two-Column Grid --- */
@@ -324,7 +324,7 @@
 .admin-select:focus,
 .admin-textarea:focus {
     outline: none;
-    border-color: #4f46e5;
+    border-color: #0d3880;
     background: var(--card-bg);
     box-shadow: 0 0 0 4px rgba(79,70,229,0.08);
 }
@@ -361,7 +361,7 @@
 }
 
 .admin-btn.primary {
-    background: #4f46e5;
+    background: #0d3880;
     color: #fff;
 }
 
@@ -452,7 +452,7 @@
 .badge.success { background: rgba(16,185,129,0.1); color: #059669; }
 .badge.warning { background: rgba(245,158,11,0.1); color: #d97706; }
 .badge.danger  { background: rgba(239,68,68,0.1);  color: #dc2626; }
-.badge.info    { background: rgba(79,70,229,0.1);  color: #4f46e5; }
+.badge.info    { background: rgba(13,56,128,0.1);  color: #0d3880; }
 
 /* --- Announcement List --- */
 .announcement-list {
@@ -551,7 +551,7 @@
 
 .admin-toast.success { background: #10b981; }
 .admin-toast.error   { background: #ef4444; }
-.admin-toast.info    { background: #4f46e5; }
+.admin-toast.info    { background: #0d3880; }
 
 /* --- Schedule Table --- */
 .schedule-grid {
@@ -566,7 +566,7 @@
 }
 
 .schedule-table th {
-    background: #4f46e5;
+    background: #0d3880;
     color: #fff;
     padding: 0.7rem 0.5rem;
     text-align: center;
@@ -854,7 +854,7 @@
     to { transform: scale(1); opacity: 1; }
 }
 .admin-modal-header {
-    background: #4f46e5;
+    background: #0d3880;
     color: #fff;
     padding: 1.25rem 1.5rem;
     display: flex; justify-content: space-between; align-items: center;
@@ -887,4 +887,5 @@
         padding: 1rem;
     }
 }
+
 
