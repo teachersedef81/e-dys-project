@@ -92,6 +92,9 @@
             <button class="admin-tab-btn" data-tab="ogretmenler">
                 <i class="fas fa-users"></i> Öğretmen Listesi
             </button>
+            <button class="admin-tab-btn" data-tab="belgeler">
+                <i class="fas fa-file-alt"></i> Belge Onayı
+            </button>
             <button class="admin-tab-btn" data-tab="ayarlar">
                 <i class="fas fa-cog"></i> Sistem Ayarları
             </button>
@@ -404,7 +407,46 @@
         </div>
 
         <!-- ===================================================
-             TAB 5 — SİSTEM AYARLARI
+             TAB 5 — BELGE ONAYI
+             =================================================== -->
+        <div class="admin-tab-content" id="tab-belgeler">
+            <div class="admin-card">
+                <div class="admin-card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                    <h3><i class="fas fa-file-alt"></i> Bekleyen Belgeler</h3>
+                    <div style="display:flex;gap:0.5rem;">
+                        <select id="docFilterStatus" class="admin-input" style="width:auto;font-size:0.875rem;">
+                            <option value="">Tüm Durumlar</option>
+                            <option value="Bekliyor">Bekleyen</option>
+                            <option value="Onaylandı">Onaylanan</option>
+                            <option value="Reddedildi">Reddedilen</option>
+                        </select>
+                        <button class="admin-btn" onclick="loadAdminDocuments()" style="background:#0d3880;color:white;border:none;border-radius:6px;padding:0.4rem 0.75rem;cursor:pointer;font-size:0.8rem;">
+                            <i class="fas fa-sync-alt"></i> Yenile
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive" style="overflow-x:auto;">
+                    <table class="admin-table" style="width:100%;border-collapse:collapse;font-size:0.875rem;">
+                        <thead>
+                            <tr style="background:#f1f5f9;">
+                                <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">Belge Adı</th>
+                                <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">Tür</th>
+                                <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">Gönderen</th>
+                                <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">Tarih</th>
+                                <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">Durum</th>
+                                <th style="padding:0.75rem;text-align:left;border-bottom:2px solid #e2e8f0;">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminDocTableBody">
+                            <tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;">Yükleniyor...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================
+             TAB 6 — SİSTEM AYARLARI
              =================================================== -->
         <div class="admin-tab-content" id="tab-ayarlar">
             <div class="admin-card">

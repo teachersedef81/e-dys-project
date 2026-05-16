@@ -3,7 +3,7 @@
  * Tamamen yeniden yazıldı: sekme yönetimi, tema, API çağrıları
  */
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 // ============================================================
 // YARDIMCI: TOAST BİLDİRİMİ
@@ -373,6 +373,86 @@ function closeMappingModal() {
     const modal = document.getElementById('mappingModal');
     if (modal) modal.style.display = 'none';
 }
+
+// ============================================================
+// BELGE ONAYI (Admin)
+// ============================================================
+async function loadAdminDocuments() {
+    const tbody = document.getElementById('adminDocTableBody');
+    if (!tbody) return;
+
+    const filterStatus = document.getElementById('docFilterStatus')?.value || '';
+    const url = filterStatus ? `${API_URL}/documents?status=${encodeURIComponent(filterStatus)}` : `${API_URL}/documents`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;">Belgeler yüklenemedi.</td></tr>`; return; }
+        const docs = await res.json();
+
+        if (!docs.length) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;"><i class="fas fa-inbox"></i> Gösterilecek belge yok.</td></tr>`;
+            return;
+        }
+
+        const statusColor = { 'Bekliyor': '#f59e0b', 'Onaylandı': '#10b981', 'Reddedildi': '#ef4444' };
+        const statusIcon  = { 'Bekliyor': 'fa-hourglass-half', 'Onaylandı': 'fa-check-circle', 'Reddedildi': 'fa-times-circle' };
+
+        tbody.innerHTML = docs.map(doc => `
+            <tr style="border-bottom:1px solid #f1f5f9;" id="doc-row-${doc.id}">
+                <td style="padding:0.75rem;">${doc.name}</td>
+                <td style="padding:0.75rem;font-size:0.8rem;color:#64748b;">${doc.type || '-'}</td>
+                <td style="padding:0.75rem;">${doc.recipients || '-'}</td>
+                <td style="padding:0.75rem;font-size:0.8rem;">${doc.date || '-'}</td>
+                <td style="padding:0.75rem;">
+                    <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;border-radius:999px;background:${statusColor[doc.status] || '#94a3b8'}20;color:${statusColor[doc.status] || '#94a3b8'};font-size:0.78rem;font-weight:600;">
+                        <i class="fas ${statusIcon[doc.status] || 'fa-circle'}"></i> ${doc.status || 'Bilinmiyor'}
+                    </span>
+                </td>
+                <td style="padding:0.75rem;">
+                    ${doc.status === 'Bekliyor' ? `
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                        <button onclick="updateDocStatus(${doc.id},'Onaylandı')" style="background:#10b981;color:white;border:none;border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;gap:0.3rem;">
+                            <i class="fas fa-check"></i> Onayla
+                        </button>
+                        <button onclick="updateDocStatus(${doc.id},'Reddedildi')" style="background:#ef4444;color:white;border:none;border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;gap:0.3rem;">
+                            <i class="fas fa-times"></i> Reddet
+                        </button>
+                        <button onclick="updateDocStatus(${doc.id},'Revize')" style="background:#f59e0b;color:white;border:none;border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;font-size:0.75rem;display:flex;align-items:center;gap:0.3rem;">
+                            <i class="fas fa-edit"></i> Revize
+                        </button>
+                    </div>` : `<span style="color:#94a3b8;font-size:0.8rem;"><i class="fas fa-lock"></i> İşlem yapıldı</span>`}
+                </td>
+            </tr>`).join('');
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;">Sunucu bağlantısı kurulamadı.</td></tr>`;
+    }
+}
+
+async function updateDocStatus(id, newStatus) {
+    try {
+        const res = await fetch(`${API_URL}/documents/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+            showToast(`Belge "${newStatus}" olarak güncellendi.`, 'success');
+            loadAdminDocuments();
+            loadStats();
+        } else {
+            showToast('Güncelleme başarısız.', 'error');
+        }
+    } catch {
+        showToast('Sunucu bağlantısı kurulamadı.', 'error');
+    }
+}
+
+// Belge sekmesi açılınca yükle
+document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+    if (btn.dataset.tab === 'belgeler') {
+        btn.addEventListener('click', loadAdminDocuments);
+    }
+});
 
 // ============================================================
 // BAŞLANGIÇ

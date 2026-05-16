@@ -111,7 +111,10 @@ const aiRateLimit    = rateLimit(20, 60 * 60 * 1000);   // 20 istek / saat
 // 1. Get all documents
 app.get('/api/documents', async (req, res) => {
     try {
-        const rows = await db.query("SELECT * FROM documents ORDER BY id DESC");
+        const { status } = req.query;
+        const rows = status
+            ? await db.query("SELECT * FROM documents WHERE status = ? ORDER BY id DESC", [status])
+            : await db.query("SELECT * FROM documents ORDER BY id DESC");
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -163,7 +166,22 @@ Kurum Bilgileri:
 İl: ${province} | İlçe: ${district} | Okul: ${school} | Öğretim Yılı: ${year}`;
 
         let docSpecificInstruction;
-        if (docType.includes("İzin") || docType.includes("Dilekçe") || docType.includes("Başvuru")) {
+        if (docType === 'EduBot') {
+            docSpecificInstruction = `Sen EduBot'sun — EduSync okul yönetim sistemi için tasarlanmış yardımcı bir asistansın.
+Öğretmenlere aşağıdaki konularda yardımcı olursun:
+- EduSync sisteminin nasıl kullanılacağı (yoklama, belge yükleme, AI tutanak oluşturma vb.)
+- MEB mevzuatı, yönetmelikler, resmi yazışma kuralları
+- Belge oluşturma ipuçları
+- Sınıf yönetimi ve eğitim önerileri
+
+Kurumsal bağlam: ${school} — ${year}
+
+Yanıt kuralları:
+- Türkçe yaz, kısa ve net ol (max 3-4 paragraf)
+- Markdown yok; sadece düz metin
+- Bilmiyorsan dürüstçe belirt, tahmin yürütme
+- Resmi ama sıcak bir dil kullan`;
+        } else if (docType.includes("İzin") || docType.includes("Dilekçe") || docType.includes("Başvuru")) {
             docSpecificInstruction = `Sen uzman bir MEB idari yazışma uzmanısın.
 Verilen bilgileri kullanarak resmi bir DİLEKÇE veya İZİN TALEBİ taslağı hazırlayacaksın.
 

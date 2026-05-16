@@ -61,12 +61,36 @@
                 title="Canlı Ders Panosu — TV Ekranında Göstermek İçin">
                 <i class="fas fa-tv mr-2"></i> Canlı Pano
             </a>
+            <button id="parentThemeToggle" title="Temayı Değiştir"
+                class="flex items-center text-slate-500 hover:text-indigo-600 font-medium transition-colors"
+                style="background:none;border:none;cursor:pointer;font-size:1.1rem;">
+                <i class="fas fa-moon"></i>
+            </button>
             <button onclick="window.location.href='../index.html'"
                 class="flex items-center text-slate-500 hover:text-red-500 font-medium transition-colors">
                 <i class="fas fa-sign-out-alt mr-2"></i> Çıkış
             </button>
         </div>
     </nav>
+    <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            document.addEventListener('DOMContentLoaded', () => {
+                const btn = document.getElementById('parentThemeToggle');
+                if (!btn) return;
+                const update = (t) => { btn.innerHTML = t === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; };
+                update(saved);
+                btn.addEventListener('click', () => {
+                    const cur = document.documentElement.getAttribute('data-theme') || 'light';
+                    const next = cur === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('theme', next);
+                    update(next);
+                });
+            });
+        })();
+    </script>
 
     <div class="container mx-auto px-6 py-8 max-w-6xl">
 

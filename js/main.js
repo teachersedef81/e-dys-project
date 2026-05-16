@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     // 4. ELEMENT REFERANSLARI
     // ============================================================
-    const API_URL = 'http://localhost:3000/api';
+    const API_URL = '/api';
 
     const homeroomCheckbox     = document.getElementById('isHomeroomTeacher');
     const clubCheckbox         = document.getElementById('isClubAdvisor');
@@ -639,10 +639,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btn) { btn.innerHTML = '<span class="loading"></span> Gönderiliyor...'; btn.disabled = true; }
 
             const payload = {
-                type:    document.getElementById('announcementType')?.value,
-                title:   document.getElementById('announcementTitle')?.value,
-                content: document.getElementById('announcementContent')?.value,
-                date:    new Date().toLocaleDateString('tr-TR')
+                type:         document.getElementById('announcementType')?.value,
+                title:        document.getElementById('announcementTitle')?.value,
+                content:      document.getElementById('announcementContent')?.value,
+                target_class: document.getElementById('announcementTarget')?.value || 'tum',
+                date:         new Date().toLocaleDateString('tr-TR')
             };
 
             try {
@@ -685,5 +686,157 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     loadInstitutionSettings();
     fetchDocuments();
+
+    // ============================================================
+    // 18. HERKES BURADA BUTONU
+    // ============================================================
+    const allPresentBtn = document.getElementById('allPresentBtn');
+    if (allPresentBtn) {
+        allPresentBtn.addEventListener('click', () => {
+            const selects = attendanceTableBody
+                ? attendanceTableBody.querySelectorAll('.status-select')
+                : [];
+            selects.forEach(sel => { sel.value = 'var'; });
+            if (selects.length > 0) showNotification(`${selects.length} öğrenci "Var" olarak işaretlendi.`, 'success');
+        });
+    }
+
+    // ============================================================
+    // 19. SESLE KOMUT (Web Speech API)
+    // ============================================================
+    const voiceInputBtn = document.getElementById('voiceInputBtn');
+    if (voiceInputBtn && aiPromptEl) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'tr-TR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            let listening = false;
+
+            voiceInputBtn.addEventListener('click', () => {
+                if (listening) {
+                    recognition.stop();
+                    return;
+                }
+                recognition.start();
+            });
+
+            recognition.onstart = () => {
+                listening = true;
+                voiceInputBtn.style.background = '#fee2e2';
+                voiceInputBtn.style.borderColor = '#ef4444';
+                voiceInputBtn.style.color = '#ef4444';
+                voiceInputBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                showNotification('Dinleniyor... Konuşun.', 'success');
+            };
+
+            recognition.onresult = (e) => {
+                const transcript = e.results[0][0].transcript;
+                aiPromptEl.value += (aiPromptEl.value ? '\n' : '') + transcript;
+            };
+
+            recognition.onend = () => {
+                listening = false;
+                voiceInputBtn.style.background = '';
+                voiceInputBtn.style.borderColor = '';
+                voiceInputBtn.style.color = '';
+                voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+            };
+
+            recognition.onerror = () => {
+                listening = false;
+                voiceInputBtn.style.background = '';
+                voiceInputBtn.style.borderColor = '';
+                voiceInputBtn.style.color = '';
+                voiceInputBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                showNotification('Ses tanıma hatası. Mikrofon erişimine izin verdiğinizden emin olun.', 'error');
+            };
+        } else {
+            voiceInputBtn.title = 'Tarayıcınız ses tanımayı desteklemiyor';
+            voiceInputBtn.style.opacity = '0.4';
+            voiceInputBtn.disabled = true;
+        }
+    }
+
+    // ============================================================
+    // 20. EduBot SOHBET BOTU
+    // ============================================================
+    const edubotToggle  = document.getElementById('edubot-toggle');
+    const edubotWindow  = document.getElementById('edubot-window');
+    const edubotClose   = document.getElementById('edubot-close');
+    const edubotInput   = document.getElementById('edubot-input');
+    const edubotSend    = document.getElementById('edubot-send');
+    const edubotMsgs    = document.getElementById('edubot-messages');
+    const edubotBadge   = document.getElementById('edubot-badge');
+
+    if (edubotToggle && edubotWindow) {
+        let isOpen = false;
+
+        const openBot = () => {
+            edubotWindow.style.display = 'flex';
+            isOpen = true;
+            edubotBadge.style.display = 'none';
+            if (edubotInput) edubotInput.focus();
+        };
+        const closeBot = () => {
+            edubotWindow.style.display = 'none';
+            isOpen = false;
+        };
+
+        edubotToggle.addEventListener('click', () => isOpen ? closeBot() : openBot());
+        if (edubotClose) edubotClose.addEventListener('click', closeBot);
+
+        const appendMsg = (text, role) => {
+            const div = document.createElement('div');
+            div.className = role === 'user' ? 'user-msg' : 'bot-msg';
+            div.textContent = text;
+            edubotMsgs.appendChild(div);
+            edubotMsgs.scrollTop = edubotMsgs.scrollHeight;
+            return div;
+        };
+
+        const sendBotMessage = async (userText) => {
+            appendMsg(userText, 'user');
+            const thinking = appendMsg('Düşünüyor...', 'bot');
+            thinking.classList.add('typing');
+
+            try {
+                const res = await fetch('/api/generate-minutes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: userText,
+                        context: {
+                            documentType: 'EduBot',
+                            school: localStorage.getItem('instSchool') || '',
+                            year:   localStorage.getItem('instYear')   || ''
+                        }
+                    })
+                });
+                const data = await res.json();
+                thinking.remove();
+                appendMsg(data.result || data.error || 'Bir yanıt oluşturulamadı.', 'bot');
+            } catch {
+                thinking.remove();
+                appendMsg('Sunucu bağlantısı kurulamadı. Lütfen tekrar deneyin.', 'bot');
+            }
+        };
+
+        const handleSend = () => {
+            const text = edubotInput ? edubotInput.value.trim() : '';
+            if (!text) return;
+            edubotInput.value = '';
+            sendBotMessage(text);
+        };
+
+        if (edubotSend) edubotSend.addEventListener('click', handleSend);
+        if (edubotInput) {
+            edubotInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+            });
+        }
+    }
 
 }); // DOMContentLoaded sonu

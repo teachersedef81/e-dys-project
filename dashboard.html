@@ -199,8 +199,13 @@
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: 1rem;">
-                            <label class="form-label">Notlar (AI İçin)</label>
-                            <textarea id="aiPrompt" class="form-input" rows="3" placeholder="Toplantı özeti..." required></textarea>
+                            <label class="form-label" style="display:flex; align-items:center; gap:0.5rem;">
+                                Notlar (AI İçin)
+                                <button type="button" id="voiceInputBtn" title="Sesle not al" style="background:none; border:1px solid #d1d5db; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#6B7280; font-size:0.8rem; flex-shrink:0;">
+                                    <i class="fas fa-microphone"></i>
+                                </button>
+                            </label>
+                            <textarea id="aiPrompt" class="form-input" rows="3" placeholder="Toplantı özeti veya mikrofon butonuna basarak sesle not alın..." required></textarea>
                         </div>
                         <div id="aiResultContainer" style="display: none; margin-top: 1.5rem;">
                             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
@@ -230,12 +235,17 @@
                 <div class="card">
                     <div class="card-header"><h2 class="card-title"><i class="fas fa-user-check"></i> Dijital Yoklama</h2></div>
                     <form id="attendanceForm">
-                        <input type="date" id="attendanceDate" class="form-input" style="margin-bottom:1rem; width:200px;" required>
+                        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+                            <input type="date" id="attendanceDate" class="form-input" style="width:200px;" required>
+                            <button type="button" id="allPresentBtn" class="btn btn-success btn-sm" style="white-space:nowrap;">
+                                <i class="fas fa-users"></i> Herkes Burada
+                            </button>
+                        </div>
                         <table class="table">
                             <thead><tr><th>Öğrenci</th><th>Durum</th></tr></thead>
                             <tbody id="attendanceTableBody"></tbody>
                         </table>
-                        <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Kaydet</button>
+                        <button type="submit" class="btn btn-primary" style="margin-top:1rem;"><i class="fas fa-save"></i> Yoklamayı Kaydet</button>
                     </form>
                 </div>
             </div>
@@ -258,10 +268,47 @@
                 <div class="card">
                     <div class="card-header"><h2 class="card-title"><i class="fas fa-bullhorn"></i> Veli İletişim</h2></div>
                     <form id="parentAnnouncementForm">
-                        <select id="announcementType" class="form-select" style="margin-bottom:1rem;"><option value="duyuru">Genel Duyuru</option></select>
+                        <div class="form-grid" style="margin-bottom:1rem;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label">Duyuru Türü</label>
+                                <select id="announcementType" class="form-select">
+                                    <option value="duyuru">Genel Duyuru</option>
+                                    <option value="odev">Ödev / Proje</option>
+                                    <option value="sinav">Sınav Bilgisi</option>
+                                    <option value="etkinlik">Etkinlik / Gezi</option>
+                                    <option value="acil">Acil Bildirim</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label">Hedef Sınıf / Şube</label>
+                                <select id="announcementTarget" class="form-select">
+                                    <option value="tum">Tüm Veliler</option>
+                                    <optgroup label="5. Sınıf">
+                                        <option value="5-A">5-A</option>
+                                        <option value="5-B">5-B</option>
+                                        <option value="5-C">5-C</option>
+                                    </optgroup>
+                                    <optgroup label="6. Sınıf">
+                                        <option value="6-A">6-A</option>
+                                        <option value="6-B">6-B</option>
+                                        <option value="6-C">6-C</option>
+                                    </optgroup>
+                                    <optgroup label="7. Sınıf">
+                                        <option value="7-A">7-A</option>
+                                        <option value="7-B">7-B</option>
+                                        <option value="7-C">7-C</option>
+                                    </optgroup>
+                                    <optgroup label="8. Sınıf">
+                                        <option value="8-A">8-A</option>
+                                        <option value="8-B">8-B</option>
+                                        <option value="8-C">8-C</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
                         <input type="text" id="announcementTitle" class="form-input" style="margin-bottom:1rem;" placeholder="Başlık" required>
                         <textarea id="announcementContent" class="form-input" rows="4" placeholder="Mesajınız..." required></textarea>
-                        <button type="submit" class="btn btn-primary" style="margin-top:1rem;">Gönder</button>
+                        <button type="submit" class="btn btn-primary" style="margin-top:1rem;"><i class="fas fa-paper-plane"></i> Velilere Gönder</button>
                     </form>
                 </div>
             </div>
@@ -273,6 +320,54 @@
 
     <!-- Footer bileşeni buraya enjekte edilecek -->
     <div id="footer-root"></div>
+
+    <!-- EduBot Floating Widget -->
+    <div id="edubot-container">
+        <div id="edubot-window" style="display:none;">
+            <div id="edubot-header">
+                <span><i class="fas fa-robot"></i> EduBot Asistan</span>
+                <button id="edubot-close" title="Kapat"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="edubot-messages">
+                <div class="bot-msg">Merhaba! Ben EduBot. Belge oluşturma, okul mevzuatı veya sistem kullanımı hakkında yardımcı olabilirim.</div>
+            </div>
+            <div id="edubot-input-row">
+                <input type="text" id="edubot-input" placeholder="Soru sorun..." autocomplete="off">
+                <button id="edubot-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button id="edubot-toggle" title="EduBot ile konuş">
+            <i class="fas fa-robot"></i>
+            <span id="edubot-badge" style="display:none;">1</span>
+        </button>
+    </div>
+
+    <style>
+        #edubot-container { position:fixed; bottom:24px; right:24px; z-index:9000; font-family:var(--font-family,'Source Sans 3',sans-serif); }
+        #edubot-toggle { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,#1e40af,#0d3880); color:white; border:none; cursor:pointer; font-size:1.4rem; box-shadow:0 4px 16px rgba(13,56,128,0.35); display:flex; align-items:center; justify-content:center; transition:transform .2s; position:relative; }
+        #edubot-toggle:hover { transform:scale(1.08); }
+        #edubot-badge { position:absolute; top:2px; right:2px; background:#ef4444; color:white; border-radius:50%; width:18px; height:18px; font-size:0.65rem; display:flex; align-items:center; justify-content:center; }
+        #edubot-window { width:340px; background:white; border-radius:14px; box-shadow:0 8px 32px rgba(0,0,0,0.18); margin-bottom:12px; display:flex; flex-direction:column; max-height:480px; border:1px solid #e2e8f0; overflow:hidden; }
+        #edubot-header { background:linear-gradient(135deg,#1e40af,#0d3880); color:white; padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; font-weight:600; font-size:0.9rem; }
+        #edubot-header button { background:none; border:none; color:white; cursor:pointer; opacity:0.8; font-size:1rem; padding:0; }
+        #edubot-header button:hover { opacity:1; }
+        #edubot-messages { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; gap:0.6rem; }
+        .bot-msg,.user-msg { padding:0.6rem 0.85rem; border-radius:10px; font-size:0.875rem; line-height:1.5; max-width:88%; word-break:break-word; }
+        .bot-msg { background:#f1f5f9; color:#1e293b; align-self:flex-start; border-bottom-left-radius:3px; }
+        .user-msg { background:#0d3880; color:white; align-self:flex-end; border-bottom-right-radius:3px; }
+        .bot-msg.typing { color:#94a3b8; font-style:italic; }
+        #edubot-input-row { display:flex; gap:0.5rem; padding:0.75rem; border-top:1px solid #e2e8f0; background:#fafafa; }
+        #edubot-input { flex:1; padding:0.5rem 0.75rem; border:1.5px solid #e2e8f0; border-radius:8px; font-size:0.875rem; font-family:inherit; outline:none; }
+        #edubot-input:focus { border-color:#0d3880; }
+        #edubot-send { background:#0d3880; color:white; border:none; border-radius:8px; padding:0.5rem 0.75rem; cursor:pointer; font-size:0.9rem; }
+        #edubot-send:hover { background:#082660; }
+        [data-theme="dark"] #edubot-window { background:#1e293b; border-color:#334155; }
+        [data-theme="dark"] .bot-msg { background:#334155; color:#e2e8f0; }
+        [data-theme="dark"] #edubot-input-row { background:#0f172a; border-color:#334155; }
+        [data-theme="dark"] #edubot-input { background:#334155; border-color:#475569; color:#e2e8f0; }
+        @media (max-width:480px) { #edubot-window { width:calc(100vw - 48px); } }
+    </style>
+
     <script type="module" src="js/main.js"></script>
 
 </body>
