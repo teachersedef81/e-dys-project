@@ -449,10 +449,85 @@ async function updateDocStatus(id, newStatus) {
 
 // Belge sekmesi açılınca yükle
 document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-    if (btn.dataset.tab === 'belgeler') {
-        btn.addEventListener('click', loadAdminDocuments);
-    }
+    if (btn.dataset.tab === 'belgeler') btn.addEventListener('click', loadAdminDocuments);
+    if (btn.dataset.tab === 'izinler')  btn.addEventListener('click', loadPermissionRequests);
 });
+
+// ============================================================
+// İZİN TALEPLERİ (Admin)
+// ============================================================
+async function loadPermissionRequests() {
+    const tbody = document.getElementById('permTableBody');
+    if (!tbody) return;
+
+    const filterStatus = document.getElementById('permFilterStatus')?.value || '';
+    const url = filterStatus
+        ? `${API_URL}/permission-requests?status=${encodeURIComponent(filterStatus)}`
+        : `${API_URL}/permission-requests`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;">Talepler yüklenemedi.</td></tr>`; return; }
+        const items = await res.json();
+
+        if (!items.length) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;"><i class="fas fa-inbox"></i> Gösterilecek talep yok.</td></tr>`;
+            return;
+        }
+
+        const statusColor = { 'Bekliyor':'#f59e0b', 'Onaylandı':'#10b981', 'Reddedildi':'#ef4444' };
+        const statusIcon  = { 'Bekliyor':'fa-hourglass-half', 'Onaylandı':'fa-check-circle', 'Reddedildi':'fa-times-circle' };
+
+        tbody.innerHTML = items.map(item => `
+            <tr style="border-bottom:1px solid #f1f5f9;">
+                <td style="padding:0.75rem;font-weight:600;">${item.teacher_name}</td>
+                <td style="padding:0.75rem;">${item.request_type}</td>
+                <td style="padding:0.75rem;font-size:0.8rem;">${item.start_date || '—'} → ${item.end_date || '—'}</td>
+                <td style="padding:0.75rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${item.reason}">${item.reason}</td>
+                <td style="padding:0.75rem;">
+                    <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;border-radius:999px;background:${statusColor[item.status] || '#94a3b8'}20;color:${statusColor[item.status] || '#94a3b8'};font-size:0.78rem;font-weight:600;">
+                        <i class="fas ${statusIcon[item.status] || 'fa-circle'}"></i> ${item.status}
+                    </span>
+                </td>
+                <td style="padding:0.75rem;">
+                    ${item.status === 'Bekliyor' ? `
+                    <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+                        <button onclick="updatePermStatus(${item.id},'Onaylandı')" style="background:#10b981;color:white;border:none;border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;font-size:0.75rem;">
+                            <i class="fas fa-check"></i> Onayla
+                        </button>
+                        <button onclick="showPermRejectModal(${item.id})" style="background:#ef4444;color:white;border:none;border-radius:6px;padding:0.3rem 0.6rem;cursor:pointer;font-size:0.75rem;">
+                            <i class="fas fa-times"></i> Reddet
+                        </button>
+                    </div>` : `<span style="color:#94a3b8;font-size:0.8rem;">${item.reviewer_note || '—'}</span>`}
+                </td>
+            </tr>`).join('');
+    } catch {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;">Sunucu bağlantısı kurulamadı.</td></tr>`;
+    }
+}
+
+async function updatePermStatus(id, status, note = '') {
+    try {
+        const res = await fetch(`${API_URL}/permission-requests/${id}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status, reviewer_note: note })
+        });
+        if (res.ok) {
+            showToast(`Talep "${status}" olarak güncellendi.`, 'success');
+            loadPermissionRequests();
+        } else {
+            showToast('Güncelleme başarısız.', 'error');
+        }
+    } catch {
+        showToast('Sunucu bağlantısı kurulamadı.', 'error');
+    }
+}
+
+function showPermRejectModal(id) {
+    const note = prompt('Red gerekçesi (opsiyonel):') ?? '';
+    updatePermStatus(id, 'Reddedildi', note);
+}
 
 // ============================================================
 // BAŞLANGIÇ

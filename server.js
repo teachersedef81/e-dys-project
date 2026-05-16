@@ -108,6 +108,143 @@ const aiRateLimit    = rateLimit(20, 60 * 60 * 1000);   // 20 istek / saat
 
 // --- API Endpoints ---
 
+// ============================================================
+// GRADES ENDPOINTS
+// ============================================================
+
+// GET /api/grades — tüm notlar, opsiyonel student_id filtresi
+app.get('/api/grades', async (req, res) => {
+    try {
+        const { student_id, term } = req.query;
+        let sql = "SELECT * FROM grades";
+        const params = [];
+        const filters = [];
+        if (student_id) { filters.push("student_id = ?"); params.push(student_id); }
+        if (term)       { filters.push("term = ?");       params.push(term); }
+        if (filters.length) sql += " WHERE " + filters.join(" AND ");
+        sql += " ORDER BY student_id, subject";
+        res.json(await db.query(sql, params));
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/grades — not ekle veya güncelle (UPSERT)
+app.post('/api/grades', async (req, res) => {
+    const { student_id, student_name, subject, score, term } = req.body;
+    if (!student_id || !subject || score === undefined)
+        return res.status(400).json({ error: 'student_id, subject ve score zorunludur.' });
+    try {
+        const existing = await db.get(
+            "SELECT id FROM grades WHERE student_id = ? AND subject = ? AND term = ?",
+            [student_id, subject, term || '1']
+        );
+        if (existing) {
+            await db.run("UPDATE grades SET score = ?, student_name = ? WHERE id = ?",
+                [score, student_name, existing.id]);
+            res.json({ updated: true, id: existing.id });
+        } else {
+            const r = await db.run(
+                "INSERT INTO grades (student_id, student_name, subject, score, term) VALUES (?,?,?,?,?)",
+                [student_id, student_name, subject, score, term || '1']
+            );
+            res.json({ created: true, id: r.id });
+        }
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// GET /api/grades/stats — risk analizi + radar verisi
+app.get('/api/grades/stats', async (req, res) => {
+    try {
+        const { term } = req.query;
+        const termFilter = term ? "WHERE term = ?" : "";
+        const params = term ? [term] : [];
+
+        // Her öğrencinin ders bazında ortalamaları
+        const byStudent = await db.query(
+            `SELECT student_id, student_name, subject, AVG(score) as avg_score
+             FROM grades ${termFilter}
+             GROUP BY student_id, subject
+             ORDER BY student_id, subject`,
+            params
+        );
+
+        // Devamsızlık sayıları
+        const absences = await db.query(
+            `SELECT student_id, student_name,
+                    SUM(CASE WHEN status='yok' THEN 1 ELSE 0 END) as absent,
+                    SUM(CASE WHEN status='gec'  THEN 1 ELSE 0 END) as late
+             FROM attendance
+             GROUP BY student_id`
+        );
+
+        // Öğrenci bazında genel ortalama
+        const avgByStudent = await db.query(
+            `SELECT student_id, student_name, AVG(score) as overall_avg
+             FROM grades ${termFilter}
+             GROUP BY student_id`,
+            params
+        );
+
+        // Ders bazında sınıf ortalaması (radar için)
+        const subjectAverages = await db.query(
+            `SELECT subject, AVG(score) as class_avg
+             FROM grades ${termFilter}
+             GROUP BY subject
+             ORDER BY subject`,
+            params
+        );
+
+        res.json({ byStudent, absences, avgByStudent, subjectAverages });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// ============================================================
+// PERMISSION REQUESTS ENDPOINTS
+// ============================================================
+
+// GET /api/permission-requests
+app.get('/api/permission-requests', async (req, res) => {
+    try {
+        const { status } = req.query;
+        const sql = status
+            ? "SELECT * FROM permission_requests WHERE status = ? ORDER BY id DESC"
+            : "SELECT * FROM permission_requests ORDER BY id DESC";
+        res.json(await db.query(sql, status ? [status] : []));
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/permission-requests — öğretmen yeni talep oluşturur
+app.post('/api/permission-requests', async (req, res) => {
+    const { teacher_name, teacher_username, request_type, reason, start_date, end_date } = req.body;
+    if (!teacher_name || !request_type || !reason)
+        return res.status(400).json({ error: 'Zorunlu alanlar eksik.' });
+    try {
+        const r = await db.run(
+            `INSERT INTO permission_requests
+             (teacher_name, teacher_username, request_type, reason, start_date, end_date)
+             VALUES (?,?,?,?,?,?)`,
+            [teacher_name, teacher_username || '', request_type, reason, start_date || '', end_date || '']
+        );
+        res.json({ success: true, id: r.id });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// PUT /api/permission-requests/:id/status — admin onaylar/reddeder
+app.put('/api/permission-requests/:id/status', async (req, res) => {
+    const { status, reviewer_note } = req.body;
+    const validStatuses = ['Onaylandı', 'Reddedildi', 'Bekliyor'];
+    if (!validStatuses.includes(status))
+        return res.status(400).json({ error: 'Geçersiz durum.' });
+    try {
+        await db.run(
+            `UPDATE permission_requests
+             SET status = ?, reviewer_note = ?, reviewed_at = datetime('now','localtime')
+             WHERE id = ?`,
+            [status, reviewer_note || '', req.params.id]
+        );
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // 1. Get all documents
 app.get('/api/documents', async (req, res) => {
     try {

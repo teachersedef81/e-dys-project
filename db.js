@@ -157,6 +157,28 @@ class Database {
                 ip TEXT,
                 detail TEXT,
                 created_at TEXT
+            )`,
+            `CREATE TABLE IF NOT EXISTS grades (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                student_id TEXT NOT NULL,
+                student_name TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                score REAL NOT NULL,
+                term TEXT DEFAULT '1',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS permission_requests (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                teacher_name TEXT NOT NULL,
+                teacher_username TEXT NOT NULL,
+                request_type TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                start_date TEXT,
+                end_date TEXT,
+                status TEXT DEFAULT 'Bekliyor',
+                reviewer_note TEXT DEFAULT '',
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                reviewed_at TEXT
             )`
         ];
 

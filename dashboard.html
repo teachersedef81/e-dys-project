@@ -60,6 +60,9 @@
                 <button class="tab-btn" data-tab="karardestek">
                     <i class="fas fa-chart-pie"></i> Karar Destek
                 </button>
+                <button class="tab-btn" data-tab="izintalebi">
+                    <i class="fas fa-calendar-check"></i> İzin Talebi
+                </button>
                 <button class="tab-btn" data-tab="veliiletisim">
                     <i class="fas fa-bullhorn"></i> Veli İletişim
                 </button>
@@ -251,15 +254,119 @@
             </div>
 
             <div class="tab-content" id="karardestekContent">
-                <div class="card">
-                    <div class="card-header"><h2 class="card-title"><i class="fas fa-chart-pie"></i> Karar Destek</h2></div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <canvas id="documentChart"></canvas>
-                        <div id="statsContainer" class="card" style="background:var(--background-light);">
-                            <p id="statsTotal">Toplam: --</p>
-                            <p id="statsPending">Onay Bekleyen: --</p>
-                            <p id="statsApproved">Onaylanan: --</p>
+                <!-- Not Giriş Paneli -->
+                <div class="card" style="margin-bottom:1.5rem;">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;">
+                        <h2 class="card-title"><i class="fas fa-graduation-cap"></i> Not Girişi</h2>
+                        <div style="display:flex;gap:0.5rem;align-items:center;">
+                            <select id="gradeStudentSelect" class="form-select" style="width:auto;">
+                                <option value="">Öğrenci seçin...</option>
+                            </select>
+                            <select id="gradeTermSelect" class="form-select" style="width:auto;">
+                                <option value="1">1. Dönem</option>
+                                <option value="2">2. Dönem</option>
+                            </select>
                         </div>
+                    </div>
+                    <div id="gradeEntryTable" style="overflow-x:auto;">
+                        <p style="color:var(--text-secondary);text-align:center;padding:1.5rem;">Yukarıdan öğrenci seçin.</p>
+                    </div>
+                </div>
+
+                <!-- Analiz Satırı -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+                    <!-- Radar Chart -->
+                    <div class="card">
+                        <div class="card-header"><h2 class="card-title"><i class="fas fa-chart-radar" style="color:#1e40af;"></i> Gelişim Grafiği</h2></div>
+                        <div style="position:relative;max-height:300px;display:flex;align-items:center;justify-content:center;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <p style="text-align:center;font-size:0.8rem;color:var(--text-secondary);margin-top:0.5rem;">Sınıf ders ortalamaları</p>
+                    </div>
+
+                    <!-- Belge İstatistikleri -->
+                    <div class="card">
+                        <div class="card-header"><h2 class="card-title"><i class="fas fa-chart-pie"></i> Belge Durumu</h2></div>
+                        <canvas id="documentChart" style="max-height:220px;"></canvas>
+                        <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.4rem;">
+                            <p id="statsTotal" style="margin:0;font-size:0.9rem;">Toplam: --</p>
+                            <p id="statsPending" style="margin:0;font-size:0.9rem;">Onay Bekleyen: --</p>
+                            <p id="statsApproved" style="margin:0;font-size:0.9rem;">Onaylanan: --</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Analizi Tablosu -->
+                <div class="card">
+                    <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+                        <h2 class="card-title"><i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> Risk Analizi</h2>
+                        <button id="refreshRiskBtn" class="btn btn-secondary btn-sm"><i class="fas fa-sync-alt"></i> Güncelle</button>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table class="table" id="riskTable">
+                            <thead>
+                                <tr>
+                                    <th>Öğrenci</th>
+                                    <th>Genel Ort.</th>
+                                    <th>Devamsızlık</th>
+                                    <th>Geç Kalma</th>
+                                    <th>Risk Seviyesi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="riskTableBody">
+                                <tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:1.5rem;">Güncelle butonuna basın.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="izintalebiContent">
+                <div class="card" style="margin-bottom:1.5rem;">
+                    <div class="card-header"><h2 class="card-title"><i class="fas fa-calendar-check"></i> Yeni İzin Talebi</h2></div>
+                    <form id="permissionRequestForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">İzin Türü</label>
+                                <select id="permType" class="form-select" required>
+                                    <option value="" disabled selected>Seçin...</option>
+                                    <option value="Yıllık İzin">Yıllık İzin</option>
+                                    <option value="Mazeret İzni">Mazeret İzni</option>
+                                    <option value="Sağlık İzni">Sağlık İzni</option>
+                                    <option value="Ücretsiz İzin">Ücretsiz İzin</option>
+                                    <option value="Görevlendirme">Görevlendirme</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Başlangıç Tarihi</label>
+                                <input type="date" id="permStartDate" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Bitiş Tarihi</label>
+                                <input type="date" id="permEndDate" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top:1rem;">
+                            <label class="form-label">Gerekçe / Açıklama</label>
+                            <textarea id="permReason" class="form-input" rows="3" placeholder="İzin talebinizin gerekçesini açıklayın..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top:1rem;"><i class="fas fa-paper-plane"></i> Talep Gönder</button>
+                    </form>
+                </div>
+
+                <!-- Geçmiş Talepler -->
+                <div class="card">
+                    <div class="card-header"><h2 class="card-title"><i class="fas fa-history"></i> Geçmiş Taleplerim</h2></div>
+                    <div style="overflow-x:auto;">
+                        <table class="table">
+                            <thead>
+                                <tr><th>Tür</th><th>Tarih Aralığı</th><th>Gerekçe</th><th>Durum</th><th>İdare Notu</th></tr>
+                            </thead>
+                            <tbody id="myPermissionsBody">
+                                <tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:1.5rem;">Talep bulunamadı.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

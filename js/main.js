@@ -688,6 +688,302 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchDocuments();
 
     // ============================================================
+    // 18. KARAR DESTEK — NOT GİRİŞİ, RADAR CHART, RİSK ANALİZİ
+    // ============================================================
+    const SUBJECTS = ['Türkçe','Matematik','Fen Bilimleri','Sosyal Bilgiler','İngilizce','Din Kültürü','Görsel Sanatlar','Beden Eğitimi'];
+
+    const gradeStudentSelect = document.getElementById('gradeStudentSelect');
+    const gradeTermSelect    = document.getElementById('gradeTermSelect');
+    const gradeEntryTable    = document.getElementById('gradeEntryTable');
+    let radarChartInstance   = null;
+
+    // Öğrenci listesini dropdown'a doldur (mockStudents kullanır)
+    const populateGradeStudents = () => {
+        if (!gradeStudentSelect) return;
+        mockStudents.forEach(s => {
+            gradeStudentSelect.add(new Option(`${s.id} - ${s.name}`, s.id));
+        });
+    };
+
+    // Seçili öğrenci için not giriş tablosunu render et
+    const renderGradeEntry = async (studentId, term) => {
+        if (!gradeEntryTable || !studentId) return;
+        const student = mockStudents.find(s => s.id === studentId);
+        if (!student) return;
+
+        let existingGrades = [];
+        try {
+            const res = await fetch(`${API_URL}/grades?student_id=${studentId}&term=${term}`);
+            if (res.ok) existingGrades = await res.json();
+        } catch { /* offline */ }
+
+        const scoreMap = {};
+        existingGrades.forEach(g => { scoreMap[g.subject] = g.score; });
+
+        gradeEntryTable.innerHTML = `
+            <table class="table" style="margin-top:1rem;">
+                <thead><tr><th>Ders</th><th style="width:160px;">Not (0–100)</th><th>Durum</th></tr></thead>
+                <tbody>
+                    ${SUBJECTS.map(sub => `
+                    <tr>
+                        <td>${sub}</td>
+                        <td>
+                            <input type="number" min="0" max="100"
+                                class="form-input grade-input"
+                                style="padding:0.4rem 0.6rem;"
+                                data-student-id="${studentId}"
+                                data-student-name="${student.name}"
+                                data-subject="${sub}"
+                                data-term="${term}"
+                                value="${scoreMap[sub] !== undefined ? scoreMap[sub] : ''}">
+                        </td>
+                        <td id="grade-status-${sub.replace(/\s/g,'_')}" style="font-size:0.8rem;color:var(--text-secondary);">
+                            ${scoreMap[sub] !== undefined ? '<i class="fas fa-check-circle" style="color:#10b981;"></i> Kayıtlı' : '—'}
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+            <button id="saveGradesBtn" class="btn btn-primary btn-sm" style="margin-top:0.75rem;">
+                <i class="fas fa-save"></i> Notları Kaydet
+            </button>`;
+
+        document.getElementById('saveGradesBtn')?.addEventListener('click', saveGrades);
+    };
+
+    const saveGrades = async () => {
+        const inputs = gradeEntryTable ? gradeEntryTable.querySelectorAll('.grade-input') : [];
+        const btn = document.getElementById('saveGradesBtn');
+        if (btn) { btn.innerHTML = '<span class="loading"></span> Kaydediliyor...'; btn.disabled = true; }
+
+        let saved = 0;
+        for (const input of inputs) {
+            const score = parseFloat(input.value);
+            if (isNaN(score) || input.value === '') continue;
+            if (score < 0 || score > 100) continue;
+            try {
+                const res = await fetch(`${API_URL}/grades`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        student_id:   input.dataset.studentId,
+                        student_name: input.dataset.studentName,
+                        subject:      input.dataset.subject,
+                        score,
+                        term:         input.dataset.term
+                    })
+                });
+                if (res.ok) {
+                    const statusEl = document.getElementById(`grade-status-${input.dataset.subject.replace(/\s/g,'_')}`);
+                    if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981;"></i> Kayıtlı';
+                    saved++;
+                }
+            } catch { /* offline */ }
+        }
+
+        if (btn) { btn.innerHTML = '<i class="fas fa-save"></i> Notları Kaydet'; btn.disabled = false; }
+        showNotification(saved > 0 ? `${saved} not başarıyla kaydedildi.` : 'Kaydedilecek not bulunamadı.', saved > 0 ? 'success' : 'warning');
+    };
+
+    if (gradeStudentSelect) {
+        gradeStudentSelect.addEventListener('change', () =>
+            renderGradeEntry(gradeStudentSelect.value, gradeTermSelect?.value || '1'));
+    }
+    if (gradeTermSelect) {
+        gradeTermSelect.addEventListener('change', () => {
+            if (gradeStudentSelect?.value) renderGradeEntry(gradeStudentSelect.value, gradeTermSelect.value);
+        });
+    }
+
+    // Radar Chart — sınıf ders ortalamaları
+    const renderRadarChart = async (term) => {
+        try {
+            const res = await fetch(`${API_URL}/grades/stats${term ? '?term=' + term : ''}`);
+            if (!res.ok) return;
+            const data = await res.json();
+
+            const labels = data.subjectAverages.map(s => s.subject);
+            const values = data.subjectAverages.map(s => Math.round(s.class_avg * 10) / 10);
+
+            const ctx = document.getElementById('radarChart');
+            if (!ctx || !window.Chart) return;
+
+            if (radarChartInstance) radarChartInstance.destroy();
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Sınıf Ortalaması',
+                        data: values,
+                        backgroundColor: 'rgba(30,64,175,0.15)',
+                        borderColor: '#1e40af',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#1e40af'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { r: { beginAtZero: true, max: 100, ticks: { stepSize: 20 } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        } catch { /* veri yok */ }
+    };
+
+    // Risk Analizi
+    const loadRiskAnalysis = async () => {
+        const tbody = document.getElementById('riskTableBody');
+        if (!tbody) return;
+
+        try {
+            const res = await fetch(`${API_URL}/grades/stats`);
+            if (!res.ok) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;">Veri yüklenemedi.</td></tr>`; return; }
+            const data = await res.json();
+
+            // Öğrenci bazında veri birleştir
+            const studentMap = {};
+            data.avgByStudent.forEach(s => {
+                studentMap[s.student_id] = { name: s.student_name, avg: Math.round(s.overall_avg * 10) / 10, absent: 0, late: 0 };
+            });
+            data.absences.forEach(a => {
+                if (studentMap[a.student_id]) {
+                    studentMap[a.student_id].absent = a.absent || 0;
+                    studentMap[a.student_id].late   = a.late   || 0;
+                }
+            });
+
+            // Notu olmayan öğrencileri de ekle (sadece devamsızlık)
+            data.absences.forEach(a => {
+                if (!studentMap[a.student_id] && a.student_id) {
+                    studentMap[a.student_id] = { name: a.student_name, avg: null, absent: a.absent || 0, late: a.late || 0 };
+                }
+            });
+
+            if (!Object.keys(studentMap).length) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:1.5rem;">Henüz not veya devamsızlık verisi yok.</td></tr>`;
+                return;
+            }
+
+            const getRiskLevel = (avg, absent) => {
+                const score = (avg !== null && avg < 50 ? 2 : avg !== null && avg < 60 ? 1 : 0)
+                            + (absent >= 10 ? 2 : absent >= 5 ? 1 : 0);
+                if (score >= 3) return { label: 'Yüksek Risk', color: '#ef4444', icon: 'fa-exclamation-triangle' };
+                if (score >= 1) return { label: 'Takip',       color: '#f59e0b', icon: 'fa-eye' };
+                return              { label: 'Normal',          color: '#10b981', icon: 'fa-check-circle' };
+            };
+
+            tbody.innerHTML = Object.values(studentMap).map(s => {
+                const risk = getRiskLevel(s.avg, s.absent);
+                return `<tr>
+                    <td>${s.name}</td>
+                    <td><strong>${s.avg !== null ? s.avg : '—'}</strong></td>
+                    <td>${s.absent} gün</td>
+                    <td>${s.late} kez</td>
+                    <td><span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:999px;background:${risk.color}20;color:${risk.color};font-size:0.8rem;font-weight:600;">
+                        <i class="fas ${risk.icon}"></i> ${risk.label}
+                    </span></td>
+                </tr>`;
+            }).join('');
+
+            await renderRadarChart();
+        } catch { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#ef4444;padding:1.5rem;">Sunucu bağlantısı kurulamadı.</td></tr>`; }
+    };
+
+    document.getElementById('refreshRiskBtn')?.addEventListener('click', loadRiskAnalysis);
+
+    // Karar Destek sekmesine geçince verileri yükle
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('[data-tab]');
+        if (btn?.dataset.tab === 'karardestek') {
+            loadStats();
+            loadRiskAnalysis();
+        }
+    });
+
+    // ============================================================
+    // 19. İZİN TALEBİ FORMU
+    // ============================================================
+    const permissionRequestForm = document.getElementById('permissionRequestForm');
+    if (permissionRequestForm) {
+        permissionRequestForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = permissionRequestForm.querySelector('button[type="submit"]');
+            if (btn) { btn.innerHTML = '<span class="loading"></span> Gönderiliyor...'; btn.disabled = true; }
+
+            const payload = {
+                teacher_name:     localStorage.getItem('teacherName') || 'Öğretmen',
+                teacher_username: '',
+                request_type:     document.getElementById('permType')?.value,
+                reason:           document.getElementById('permReason')?.value,
+                start_date:       document.getElementById('permStartDate')?.value,
+                end_date:         document.getElementById('permEndDate')?.value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/permission-requests`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    showNotification('İzin talebiniz idariye iletildi.', 'success');
+                    permissionRequestForm.reset();
+                    loadMyPermissions();
+                } else {
+                    showNotification('Talep gönderilemedi.', 'error');
+                }
+            } catch {
+                showNotification('Sunucu bağlantısı kurulamadı.', 'error');
+            } finally {
+                if (btn) { btn.innerHTML = '<i class="fas fa-paper-plane"></i> Talep Gönder'; btn.disabled = false; }
+            }
+        });
+    }
+
+    const loadMyPermissions = async () => {
+        const tbody = document.getElementById('myPermissionsBody');
+        if (!tbody) return;
+        try {
+            const res = await fetch(`${API_URL}/permission-requests`);
+            if (!res.ok) return;
+            const items = await res.json();
+
+            if (!items.length) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:1.5rem;">Talep bulunamadı.</td></tr>`;
+                return;
+            }
+
+            const statusStyle = {
+                'Bekliyor':   { color:'#f59e0b', icon:'fa-hourglass-half' },
+                'Onaylandı':  { color:'#10b981', icon:'fa-check-circle' },
+                'Reddedildi': { color:'#ef4444', icon:'fa-times-circle' }
+            };
+
+            tbody.innerHTML = items.map(item => {
+                const st = statusStyle[item.status] || statusStyle['Bekliyor'];
+                return `<tr>
+                    <td>${item.request_type}</td>
+                    <td>${item.start_date || '—'} / ${item.end_date || '—'}</td>
+                    <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${item.reason}">${item.reason}</td>
+                    <td><span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.2rem 0.6rem;border-radius:999px;background:${st.color}20;color:${st.color};font-size:0.78rem;font-weight:600;">
+                        <i class="fas ${st.icon}"></i> ${item.status}
+                    </span></td>
+                    <td style="font-size:0.8rem;color:var(--text-secondary);">${item.reviewer_note || '—'}</td>
+                </tr>`;
+            }).join('');
+        } catch { /* offline */ }
+    };
+
+    // İzin sekmesi açılınca geçmiş talepleri yükle
+    document.addEventListener('click', e => {
+        const btn = e.target.closest('[data-tab]');
+        if (btn?.dataset.tab === 'izintalebi') loadMyPermissions();
+    });
+
+    // Not giriş dropdown'ını başlat
+    populateGradeStudents();
+
+    // ============================================================
     // 18. HERKES BURADA BUTONU
     // ============================================================
     const allPresentBtn = document.getElementById('allPresentBtn');
